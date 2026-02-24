@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تعديل الوصفة</title>
+
+<link href="style.css" rel="stylesheet">
+
+</head>
+<body>
+ <header class="site-header">
+  <div class="container header-inner">
+
+    <!-- الشعار أقصى اليمين -->
+    <div id="logo">
+      <img src="images/logo.png" alt="Logo">
+      <span>سُفــــرة</span>
+    </div>
+
+    
+    <nav class="nav">
+      <a class="nav-chip" href="user.html">صفحة المستخدم</a>
+      <a class="nav-chip" href="my-recipes.html">وصفاتي</a>
+    </nav>
+    
+  </div>
+</header>
+
+<div class="form-container">
+<h1>تعديل الوصفة</h1>
+
+<form id="editForm">
+
+  <div class="form-group">
+    <label>اسم الوصفة:</label>
+    <input type="text" id="name" value="كيكة الشوكولاتة الفاخرة" required>
+  </div>
+
+  <div class="form-group">
+    <label>التصنيف:</label>
+    <select id="category" required>
+      <option value="">اختر</option>
+      <option>إفطار</option>
+      <option>سحور</option>
+      <option selected>حلويات</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>الوصف:</label>
+    <textarea id="description" required>كيكة شوكولاتة غنية ولذيذة مثالية لجميع المناسبات</textarea>
+  </div>
+
+  <div class="form-group">
+    <label>رفع صورة الوصفة:</label>
+    <input type="file" id="photoUpload" accept="image/*">
+    <div class="media-card" style="display:inline-block; vertical-align:top; margin-right:15px;">
+      <h4>الصورة الحالية</h4>
+      <div class="preview">
+        <img id="photoPreview" src="images/chocolate Cake.JPG" alt="كيكة الشوكولاتة">
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="section-title">المكونات:</div>
+  <div id="ingredientsContainer">
+    
+    <div class="ingredient-row">
+      <label>المكون 1:</label>
+      <input type="text" class="ing-name" value="دقيق" placeholder="الاسم" required>
+      <input type="text" class="ing-quantity" value="2 كوب" placeholder="الكمية" required>
+      <button type="button" class="delete-row-btn" onclick="this.parentElement.remove()">حذف</button>
+    </div>
+
+    <div class="ingredient-row">
+      <label>المكون 2:</label>
+      <input type="text" class="ing-name" value="كاكاو" placeholder="الاسم" required>
+      <input type="text" class="ing-quantity" value="1/2 كوب" placeholder="الكمية" required>
+      <button type="button" class="delete-row-btn" onclick="this.parentElement.remove()">حذف</button>
+    </div>
+
+    <div class="ingredient-row">
+      <label>المكون 3:</label>
+      <input type="text" class="ing-name" value="سكر" placeholder="الاسم" required>
+      <input type="text" class="ing-quantity" value="1 كوب" placeholder="الكمية" required>
+      <button type="button" class="delete-row-btn" onclick="this.parentElement.remove()">حذف</button>
+    </div>
+
+    <div class="ingredient-row">
+      <label>المكون 4:</label>
+      <input type="text" class="ing-name" value="بيض" placeholder="الاسم" required>
+      <input type="text" class="ing-quantity" value="3" placeholder="الكمية" required>
+      <button type="button" class="delete-row-btn" onclick="this.parentElement.remove()">حذف</button>
+    </div>
+
+   
+
+  </div>
+  <button type="button" class="action-btn add-btn" onclick="addIngredientRow()">+ إضافة مكون آخر</button>
+
+  <div class="section-title">طريقة التحضير:</div>
+  <div id="stepsContainer">
+    
+    <div class="step-row">
+      <label>الخطوة 1:</label>
+      <input type="text" class="step-text" value="اخلطي المكونات الجافة معا." required>
+      <button type="button" class="delete-row-btn" onclick="this.parentElement.remove()">حذف</button>
+    </div>
+
+    <div class="step-row">
+      <label>الخطوة 2:</label>
+      <input type="text" class="step-text" value="أضيفي البيض والحليب وامزجي حتى يتجانس الخليط." required>
+      <button type="button" class="delete-row-btn" onclick="this.parentElement.remove()">حذف</button>
+    </div>
+
+    <div class="step-row">
+      <label>الخطوة 3:</label>
+      <input type="text" class="step-text" value="اسكبي الخليط في قالب مدهون." required>
+      <button type="button" class="delete-row-btn" onclick="this.parentElement.remove()">حذف</button>
+    </div>
+
+     <div class="step-row">
+      <label>الخطوة 3:</label>
+      <input type="text" class="step-text" value="اخبزي في فرن 180° لمدة 25–30 دقيقة." required>
+      <button type="button" class="delete-row-btn" onclick="this.parentElement.remove()">حذف</button>
+    </div>
+
+  </div>
+  <button type="button" class="action-btn add-btn" onclick="addStepRow()">+ إضافة خطوة أخرى</button>
+
+  <!-- فيديو -->
+  <div class="section-title">فيديو(اختياري) : </div>
+  <div class="form-group">
+      <label>رفع فيديو:</label>
+      <input type="file" accept="video/*">
+    </div>
+  
+  <div class="form-group">
+    <label>رابط الفيديو:</label>
+    <input type="url" id="videoUrl" placeholder="https://" value="https://youtu.be/W6D63sXlVto?si=IhOcDF2Fx6cKYfFB" style="width:45%;">
+    <div class="media-card" style="display:inline-block; vertical-align:top; margin-right:15px;">
+      <h4>الفيديو الحالي</h4>
+      <div class="preview">
+        <video id="videoPreview" controls></video>
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" class="submit-btn">تحديث الوصفة</button>
+</form>
+</div>
+
+ <footer class="site-footer" role="contentinfo">
+  <div class="container footer-inner">
+
+    <!-- عمود: نبذة -->
+    <div class="footer-col footer-about">
+      <div class="footer-brand">
+        <img src="images/logo.png" alt="شعار سُفرة" class="footer-logo">
+        <h3 class="footer-title">سُفرة</h3>
+      </div>
+      <p class="footer-text">
+        منصة وصفات رمضانية تساعدك توصل لوصفات الإفطار والسحور بطريقة مرتبة وبسيطة.
+      </p>
+    </div>
+
+    
+
+    <!-- عمود: استكشاف -->
+    <div class="footer-col">
+      <h4 class="footer-heading">استكشاف</h4>
+      <ul class="footer-links">
+        <li><a href="index.html">الرئيسية</a></li>
+        <li><a href="my-recipes.html">وصفاتي</a></li>
+        <li><a href="add-recipe.html">إضافة وصفة</a></li>
+        <li><a href="login.html">تسجيل الدخول</a></li>
+      </ul>
+    </div>
+	
+	<!-- عمود: التصنيفات -->
+    <div class="footer-col">
+      <h4 class="footer-heading">التصنيفات</h4>
+      <ul class="footer-links">
+        <li><a href="my-recipes.html">إفطار</a></li>
+        <li><a href="my-recipes.html">سحور</a></li>
+        <li><a href="my-recipes.html">حلويات</a></li>
+      </ul>
+    </div>
+
+    <!-- عمود: تواصل -->
+    <div class="footer-col">
+      <h4 class="footer-heading">تواصل معنا</h4>
+
+      <div class="footer-social">
+        <a class="social-btn" href="#" aria-label="انستقرام">IG</a>
+        <a class="social-btn" href="#" aria-label="إكس">X</a>
+        <a class="social-btn" href="#" aria-label="فيسبوك">f</a>
+        <a class="social-btn" href="#" aria-label="يوتيوب">▶</a>
+      </div>
+
+      <p class="footer-mini">
+        البريد: <a href="mailto:sufrah@example.com">sufrah@example.com</a>
+      </p>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container footer-bottom-inner">
+      <small>© 2026 سُفرة .</small>
+      <small>صُنع بـ <span aria-hidden="true">♥</span> لرمضان</small>
+    </div>
+  </div>
+</footer>
+
+<script>
+// فقط دوال الإضافة للمكونات والخطوات الجديدة
+let ingredientCount = 5; // نبدأ من 6 لأن عندنا 5 مكونات جاهزة
+let stepCount = 3; // نبدأ من 4 لأن عندنا 3 خطوات جاهزة
+
+function addIngredientRow() {
+    ingredientCount++;
+    const container = document.getElementById('ingredientsContainer');
+    const div = document.createElement('div');
+    div.className = 'ingredient-row';
+    div.innerHTML = `
+        <label>المكون ${ingredientCount}:</label>
+        <input type="text" class="ing-name" value="" placeholder="الاسم" required>
+        <input type="text" class="ing-quantity" value="" placeholder="الكمية" required>
+        <button type="button" class="delete-row-btn" onclick="this.parentElement.remove()">حذف</button>
+    `;
+    container.appendChild(div);
+}
+
+function addStepRow() {
+    stepCount++;
+    const container = document.getElementById('stepsContainer');
+    const div = document.createElement('div');
+    div.className = 'step-row';
+    div.innerHTML = `
+        <label>الخطوة ${stepCount}:</label>
+        <input type="text" class="step-text" value="" required>
+        <button type="button" class="delete-row-btn" onclick="this.parentElement.remove()">حذف</button>
+    `;
+    container.appendChild(div);
+}
+
+// حفظ التعديلات
+document.getElementById('editForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    alert('✅ تم حفظ التعديلات بنجاح!');
+    window.location.href = 'my-recipes.html';
+});
+</script>
+
+</body>
+</html>

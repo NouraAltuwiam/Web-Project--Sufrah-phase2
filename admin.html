@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سفرة - لوحة الإدارة</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- Header Full Width -->
+<header class="site-header">
+  <div class="container header-inner">
+
+    <!-- الشعار أقصى اليمين -->
+    <div id="logo">
+      <img src="images/logo.png" alt="Logo">
+      <span>سُفــــرة</span>
+    </div>
+
+    
+    <nav class="nav">
+      <a class="nav-chip is-active" href="admin.html">لوحة الإدارة</a>
+    </nav>
+    
+    <a href="index.html" class="sign-out">تسجيل الخروج</a>
+  </div>
+</header>
+
+  <div class="container">
+
+    <!-- welcome message -->
+    <section class="welcome">
+      <h1>مرحبا <span>Admin</span> !</h1>
+    </section>
+
+    <!-- Main Content Grid -->
+    <div class="main-grid">
+
+      <!-- Admin Information -->
+      <section class="user-info-card">
+        <div class="user-header">
+          <div class="user-photo">
+            <div class="user-photo-fallback">A</div>
+          </div>
+
+          <div class="user-title">
+            <h2>Admin User</h2>
+          </div>
+        </div>
+
+        <!-- admin information -->
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-icon">👤</div>
+            <div class="info-content">
+              <div class="info-label">الاسم</div>
+              <div class="info-value">Admin User</div>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">📧</div>
+            <div class="info-content">
+              <div class="info-label">البريد الإلكتروني</div>
+              <div class="info-value">admin@sufra.com</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Admin Statistics -->
+      <section class="my-recipes-card">
+        <h3>إحصائيات النظام</h3>
+
+        <div class="stats-boxes">
+          <div class="stat-box">
+            <div class="stat-number">25</div>
+            <div class="stat-label">إجمالي المستخدمين</div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-number">150</div>
+            <div class="stat-label">إجمالي الوصفات</div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-number">3</div>
+            <div class="stat-label">البلاغات المعلقة</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Pending Reports Section -->
+    <!-- Pending Reports Section -->
+<section class="all-recipes-section">
+  <h2 class="section-title">البلاغات المعلقة</h2>
+
+  <table class="recipes-table">
+    <thead>
+      <tr>
+        <th>اسم الوصفة</th>
+        <th>صورة الوصفة</th>
+        <th>صاحب الوصفة</th>
+        <th>الإجراءات</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- البلاغ 1 -->
+      <tr>
+        <td>
+          <a href="view-recipe.html" class="recipe-name-link">كيكة الشوكولاتة الفاخرة</a>
+        </td>
+        <td>
+          <img class="thumb-img" src="images/chocolate Cake.JPG" alt="صورة الوصفة">
+        </td>
+        <td>
+          <div class="creator-info">
+            <img src="images/pink-girl.webp" class="creator-photo" alt="نورة">
+            <span class="creator-name">نورة أحمد</span>
+          </div>
+        </td>
+        <td>
+          <form class="report-form" onsubmit="handleReportAction(event)">
+            <input type="hidden" name="recipeId" value="1">
+            <input type="hidden" name="userId" value="user1">
+            <select name="action" required>
+              <option value="">اختر إجراءً</option>
+              <option value="block">حظر المستخدم</option>
+              <option value="dismiss">رفض البلاغ</option>
+            </select>
+            <button type="submit" class="submit-btn-small">تنفيذ</button>
+          </form>
+        </td>
+      </tr>
+
+      <!-- البلاغ 2 -->
+      <tr>
+        <td>
+          <a href="view-recipe.html" class="recipe-name-link">شوربة العدس الأحمر</a>
+        </td>
+        <td>
+          <img class="thumb-img" src="images/recipe2.png" alt="صورة الوصفة">
+        </td>
+        <td>
+          <div class="creator-info">
+            <img src="images/pink-girl.webp" class="creator-photo" alt="سارة">
+            <span class="creator-name">سارة محمد</span>
+          </div>
+        </td>
+        <td>
+          <form class="report-form" onsubmit="handleReportAction(event)">
+            <input type="hidden" name="recipeId" value="2">
+            <input type="hidden" name="userId" value="user2">
+            <select name="action" required>
+              <option value="">اختر إجراءً</option>
+              <option value="block">حظر المستخدم</option>
+              <option value="dismiss">رفض البلاغ</option>
+            </select>
+            <button type="submit" class="submit-btn-small">تنفيذ</button>
+          </form>
+        </td>
+      </tr>
+
+      <!-- البلاغ 3 -->
+      <tr>
+        <td>
+          <a href="view-recipe.html" class="recipe-name-link">سمبوسة الجبن</a>
+        </td>
+        <td>
+          <img class="thumb-img" src="images/recipe1.png" alt="سمبوسه جبن">
+        </td>
+        <td>
+          <div class="creator-info">
+            <img src="images/orang-girl.webp" class="creator-photo" alt="ليلى">
+            <span class="creator-name">ليلى خالد</span>
+          </div>
+        </td>
+        <td>
+          <form class="report-form" onsubmit="handleReportAction(event)">
+            <input type="hidden" name="recipeId" value="3">
+            <input type="hidden" name="userId" value="user3">
+            <select name="action" required>
+              <option value="">اختر إجراءً</option>
+              <option value="block">حظر المستخدم</option>
+              <option value="dismiss">رفض البلاغ</option>
+            </select>
+            <button type="submit" class="submit-btn-small">تنفيذ</button>
+          </form>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+    <!-- Blocked Users Section -->
+    <section class="favorites-section">
+      <h2 class="section-title">المستخدمون المحظورون</h2>
+
+      <table class="favorites-table">
+        <thead>
+          <tr>
+            <th>اسم المستخدم</th>
+            <th>البريد الإلكتروني</th>
+            <th>إجراء</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="creator-info">
+                <img src="images/boy-pic.webp" class="creator-photo" alt="أحمد">
+                <span class="creator-name">أحمد علي</span>
+              </div>
+            </td>
+            <td>ahmed.ali@example.com</td>
+            <td>
+              <button class="unblock-btn">إلغاء الحظر</button>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="creator-info">
+                <img src="images/orang-girl.webp" class="creator-photo" alt="فاطمة">
+                <span class="creator-name">فاطمة حسن</span>
+              </div>
+            </td>
+            <td>fatima.hassan@example.com</td>
+            <td>
+              <button class="unblock-btn">إلغاء الحظر</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </div>
+
+</body>
+</html>

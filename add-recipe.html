@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>إضافة وصفة جديدة</title>
+
+
+<link href="style.css" rel="stylesheet">
+
+
+</head>
+
+<body>
+  
+  <header class="site-header">
+  <div class="container header-inner">
+
+    <!-- الشعار أقصى اليمين -->
+    <div id="logo">
+      <img src="images/logo.png" alt="Logo">
+      <span>سُفــــرة</span>
+    </div>
+
+    
+    <nav class="nav">
+      <a class="nav-chip" href="user.html">صفحة المستخدم</a>
+      <a class="nav-chip" href="my-recipes.html">وصفاتي</a>
+    </nav>
+    
+  </div>
+</header>
+
+<div class="form-container">
+
+  <h1>إضافة وصفة جديدة</h1>
+
+  <form id="recipeForm">
+
+    <div class="form-group">
+      <label>اسم الوصفة:</label>
+      <input type="text" required>
+    </div>
+
+    <div class="form-group">
+      <label>التصنيف:</label>
+      <select required>
+        <option value="">اختر</option>
+        <option>إفطار</option>
+        <option>سحور</option>
+        <option>حلويات</option>
+      </select>
+    </div>
+
+    
+
+    <div class="form-group">
+      <label>الوصف:</label>
+      <textarea required></textarea>
+    </div>
+    <!-- نوع الوصفة -->
+    <div class="recipe-type-section">
+      <label class="section-label">نوع الوصفة</label>
+      <div class="recipe-type-buttons">
+        <button type="button" class="recipe-type-btn active" data-type="regular" onclick="selectRecipeType('regular')">
+          <span class="type-icon">🔥</span>
+          <span>عادي</span>
+        </button>
+        <button type="button" class="recipe-type-btn" data-type="healthy" onclick="selectRecipeType('healthy')">
+          <span class="type-icon">🌿</span>
+          <span>صحي</span>
+        </button>
+      </div>
+      <input type="hidden" id="recipeType" value="regular" required>
+    </div>
+
+    <div class="form-group">
+      <label>رفع صورة الوصفة:</label>
+      <input type="file" accept="image/*" required>
+    </div>
+
+    <div class="section-title">المكونات:</div>
+    <div id="ingredients">
+      <div class="ingredient-row">
+        <label>المكون 1:</label>
+        <input type="text" placeholder="الاسم" required>
+        <input type="text" placeholder="الكمية" required>
+        <button type="button" class="delete-row-btn" onclick="removeRow(this)">حذف</button>
+      </div>
+    </div>
+    <button type="button" class="action-btn add-btn" onclick="addIngredient()">+ إضافة مكون آخر</button>
+
+    <!-- البدائل الصحية (اختياري) -->
+    <div class="healthy-alternatives-section">
+      <div class="healthy-header">
+        <div class="healthy-title">
+          <span class="healthy-icon">🌿</span>
+          <span>بدائل صحية (اختياري)</span>
+        </div>
+        <button type="button" class="action-btn add-btn" onclick="addHealthyAlternative()">+ إضافة بديل</button>
+      </div>
+      <p class="healthy-description">أضف بدائل صحية للمكونات لجعل وصفتك أخف</p>
+      <div id="healthyAlternatives">
+        <!-- سيتم إضافة البدائل هنا -->
+      </div>
+    </div>
+
+    <div class="section-title">طريقة التحضير:</div>
+    <div id="steps">
+      <div class="step-row">
+        <label>الخطوة 1:</label>
+        <input type="text" required>
+        <button type="button" class="delete-row-btn" onclick="removeRow(this)">حذف</button>
+      </div>
+    </div>
+    <button type="button" class="action-btn add-btn" onclick="addStep()">+ إضافة خطوة أخرى</button>
+
+    <div class="section-title">فيديو(اختياري) : </div>
+    <div class="form-group">
+      <label>رفع فيديو:</label>
+      <input type="file" accept="video/*">
+    </div>
+
+    <div class="form-group">
+      <label>رابط الفيديو:</label>
+      <input type="url" placeholder="https://">
+    </div>
+
+    <button type="submit" class="submit-btn">إضافة الوصفة</button>
+  </form>
+</div>
+
+  </form>
+</div>
+ <footer class="site-footer" role="contentinfo">
+  <div class="container footer-inner">
+
+    <!-- عمود: نبذة -->
+    <div class="footer-col footer-about">
+      <div class="footer-brand">
+        <img src="images/logo.png" alt="شعار سُفرة" class="footer-logo">
+        <h3 class="footer-title">سُفرة</h3>
+      </div>
+      <p class="footer-text">
+        منصة وصفات رمضانية تساعدك توصل لوصفات الإفطار والسحور بطريقة مرتبة وبسيطة.
+      </p>
+    </div>
+
+    
+
+    <!-- عمود: استكشاف -->
+    <div class="footer-col">
+      <h4 class="footer-heading">استكشاف</h4>
+      <ul class="footer-links">
+        <li><a href="index.html">الرئيسية</a></li>
+        <li><a href="my-recipes.html">وصفاتي</a></li>
+        <li><a href="add-recipe.html">إضافة وصفة</a></li>
+        <li><a href="login.html">تسجيل الدخول</a></li>
+      </ul>
+    </div>
+	
+	<!-- عمود: التصنيفات -->
+    <div class="footer-col">
+      <h4 class="footer-heading">التصنيفات</h4>
+      <ul class="footer-links">
+        <li><a href="my-recipes.html">إفطار</a></li>
+        <li><a href="my-recipes.html">سحور</a></li>
+        <li><a href="my-recipes.html">حلويات</a></li>
+      </ul>
+    </div>
+
+    <!-- عمود: تواصل -->
+    <div class="footer-col">
+      <h4 class="footer-heading">تواصل معنا</h4>
+
+      <div class="footer-social">
+        <a class="social-btn" href="#" aria-label="انستقرام">IG</a>
+        <a class="social-btn" href="#" aria-label="إكس">X</a>
+        <a class="social-btn" href="#" aria-label="فيسبوك">f</a>
+        <a class="social-btn" href="#" aria-label="يوتيوب">▶</a>
+      </div>
+
+      <p class="footer-mini">
+        البريد: <a href="mailto:sufrah@example.com">sufrah@example.com</a>
+      </p>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container footer-bottom-inner">
+      <small>© 2026 سُفرة .</small>
+      <small>صُنع بـ <span aria-hidden="true">♥</span> لرمضان</small>
+    </div>
+  </div>
+</footer>
+
+<script>
+
+let ingredientCount = 1;
+let stepCount = 1;
+let alternativeCount = 0;
+
+// دالة اختيار نوع الوصفة
+function selectRecipeType(type) {
+  // إزالة active من جميع الأزرار
+  document.querySelectorAll('.recipe-type-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  // إضافة active للزر المختار
+  document.querySelector(`.recipe-type-btn[data-type="${type}"]`).classList.add('active');
+  
+  // تحديث القيمة المخفية
+  document.getElementById('recipeType').value = type;
+}
+
+function addIngredient(){
+  ingredientCount++;
+  const div = document.createElement("div");
+  div.className = "ingredient-row";
+  div.innerHTML = `
+    <label>المكون ${ingredientCount}:</label>
+    <input type="text" placeholder="الاسم" required>
+    <input type="text" placeholder="الكمية" required>
+    <button type="button" class="delete-row-btn" onclick="removeRow(this)">حذف</button>
+  `;
+  document.getElementById("ingredients").appendChild(div);
+}
+
+function addHealthyAlternative(){
+  alternativeCount++;
+  const div = document.createElement("div");
+  div.className = "alternative-row";
+  div.innerHTML = `
+    <label>بديل ${alternativeCount}:</label>
+    <input type="text" placeholder="المكون الأصلي" class="alternative-input">
+    <span class="arrow-icon">←</span>
+    <input type="text" placeholder="البديل الصحي" class="alternative-input">
+    <button type="button" class="delete-row-btn" onclick="removeRow(this)">حذف</button>
+  `;
+  document.getElementById("healthyAlternatives").appendChild(div);
+}
+
+function addStep(){
+  stepCount++;
+  const div = document.createElement("div");
+  div.className = "step-row";
+  div.innerHTML = `
+    <label>الخطوة ${stepCount}:</label>
+    <input type="text" required>
+    <button type="button" class="delete-row-btn" onclick="removeRow(this)">حذف</button>
+  `;
+  document.getElementById("steps").appendChild(div);
+}
+
+function removeRow(btn){
+  btn.parentElement.remove();
+}
+
+document.getElementById("recipeForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  window.location.href = "my-recipes.html";
+});
+</script>
+
+</body>
+</html>

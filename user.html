@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>سفرة</title>
+    <link rel="stylesheet" href="style.css">
+  
+</head>
+
+<body>
+
+  <!-- Header Full Width -->
+  <header class="site-header">
+  <div class="container header-inner">
+
+    <!-- الشعار أقصى اليمين -->
+    <div id="logo">
+      <img src="images/logo.png" alt="Logo">
+      <span>سُفــــرة</span>
+    </div>
+
+    
+    <nav class="nav">
+      <a class="nav-chip is-active" href="user.html">صفحة المستخدم</a>
+      <a class="nav-chip" href="my-recipes.html">وصفاتي</a>
+    </nav>
+    
+    <a href="index.html" class="sign-out">تسجيل الخروج</a>
+  </div>
+</header>
+
+  <div class="container">
+
+    <!--welcome message and user info-->
+    <section class="welcome">
+      <h1>مرحبا <span>سارة</span> !</h1>
+    </section>
+
+    <!-- Main Content Grid -->
+    <div class="main-grid">
+
+      <!-- User Information -->
+       <section class="user-info-card">
+        <div class="user-header">
+          <div class="user-photo">
+            <img src="images/user.png" alt="User Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+
+          <div class="user-title">
+            <h2>سارة محمد</h2>
+          </div>
+        </div>
+
+        <!-- admin information -->
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-icon">👤</div>
+            <div class="info-content">
+              <div class="info-label">الاسم</div>
+              <div class="info-value">سارة محمد</div>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">📧</div>
+            <div class="info-content">
+              <div class="info-label">البريد الإلكتروني</div>
+              <div class="info-value">sarah@sufra.com</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!--my recipes-->
+      <section class="my-recipes-card">
+        <h3>وصفاتي</h3>
+
+        <a href="my-recipes.html" class="recipes-link">
+          عرض جميع وصفاتي
+          <img src="images/arrow.svg" class="icon-sm" alt="سهم">
+        </a>
+
+        <div class="stats-boxes">
+          <div class="stat-box">
+            <div class="stat-number" id="totalRecipes">3</div>
+            <div class="stat-label">إجمالي الوصفات</div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-number">
+              <img src="images/heart.svg" class="heart-icon" alt="قلب">
+              <span id="totalLikes">2</span>
+            </div>
+            <div class="stat-label">إجمالي الإعجابات</div>
+          </div>
+        </div>
+
+        
+      </section>
+
+    </div>
+
+    <!--all Available Recipes-->
+    <section class="all-recipes-section">
+      <h2 class="section-title">جميع الوصفات المتاحة</h2>
+
+      <!-- Filter Section -->
+      <div class="filter-bar">
+
+        <img src="images/filter.svg" class="icon-sm" alt="تصفية">
+
+        <label for="categoryFilter" class="filter-label">تصفية حسب الفئة:</label>
+
+        <!--dropdown-->
+        <select id="categoryFilter" class="category-select">
+          <option value="all">جميع الفئات</option>
+          <option value="breakfast">فطور</option>
+          <option value="suhoor">سحور</option>
+          <option value="desserts">حلويات</option>
+        </select>
+
+        <button class="filter-button" type="button">تصفية</button>
+
+      </div>
+
+      <table class="recipes-table">
+        <thead>
+          <tr>
+            <th>اسم الوصفة</th>
+            <th>صورة الوصفة</th>
+            <th>صاحب الوصفة</th>
+            <th>عدد الإعجابات</th>
+            <th>الفئة</th>
+          </tr>
+        </thead>
+        <tbody id="allRecipesBody">
+          <tr>
+            <td>
+              <a href="view-recipe.html" class="recipe-name-link">حساء الحريرة المغربي التقليدي
+                 <img src="images/arrow.svg" class="recipe-arrow" alt="">
+              </a>
+              
+            </td>
+            <td>
+              <img class="thumb-img" src="images/harira.jpg" alt="حساء الحريرة">
+            </td>
+            <td>
+              <div class="creator-info">
+                <img src="images/pink-girl.webp" class="creator-photo" alt="نورة">
+                <span class="creator-name">نورة أحمد</span>
+              </div>
+            </td>
+            <td><img src="images/heart.svg" class="likes-heart" alt="إعجاب"> 342</td>
+            <td>
+              <span class="reel-category">إفطار</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="view-recipe.html" class="recipe-name-link">سليق بأسرع طريقة 
+                <img src="images/arrow.svg" class="recipe-arrow" alt="">
+              </a>
+            </td>
+            <td>
+              <img class="thumb-img" src="images/سليق.jpg" alt="سليق">
+            </td>
+            <td>
+              <div class="creator-info">
+                <img src="images/orang-girl.webp" class="creator-photo" alt="لمياء">
+                <span class="creator-name">لمياء خالد</span>
+              </div>
+            </td>
+            <td><img src="images/heart.svg" class="likes-heart" alt="إعجاب"> 189</td>
+            <td>
+              <span class="reel-category">سحور</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="view-recipe.html" class="recipe-name-link">كرات التمر 
+                <img src="images/arrow.svg" class="recipe-arrow" alt="">
+              </a>
+            </td>
+            <td>
+              <img class="thumb-img" src="images/كرات تمر.jpg" alt="كرات التمر">
+            </td>
+            <td>
+              <div class="creator-info">
+                <img src="images/pink-girl.webp" class="creator-photo" alt="لينا">
+                <span class="creator-name">لينا محمد</span>
+              </div>
+            </td>
+            <td><img src="images/heart.svg" class="likes-heart" alt="إعجاب"> 198</td>
+            <td>
+              <span class="reel-category">حلويات</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <a href="view-recipe.html" class="recipe-name-link">كنافة</a>
+            </td>
+            <td>
+              <img class="thumb-img" src="images/kunafa.jpg" alt="كنافة">
+            </td>
+            <td>
+              <div class="creator-info">
+                <img src="images/pink-girl.webp" class="creator-photo" alt="سارة">
+                <span class="creator-name">سارة فيصل</span>
+              </div>
+            </td>
+            <td>210</td>
+            <td>
+              <span class="reel-category">حلويات</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Favourite Recipes-->
+    <section class="favorites-section">
+
+      <h2 class="section-title">
+        <img src="images/heart.svg" class="heart-title" alt="قلب">
+        وصفاتي المفضلة
+      </h2>
+
+      <table class="favorites-table">
+        <thead>
+          <tr>
+            <th>اسم الوصفة</th>
+            <th>صورة الوصفة</th>
+            <th>إجراء</th>
+          </tr>
+        
+        </thead>
+
+        <tbody id="favRecipesBody">
+          <tr>
+            <td>
+              <div class="creator-info">
+                <a href="view-recipe.html"><span class="creator-name">كرات التمر </span>
+                <img src="images/arrow.svg" class="recipe-arrow" alt="">
+              </a>
+              </div>
+            </td>
+            <td>
+              <img class="thumb-img" src="images/كرات تمر.jpg" alt="كرات التمر">
+            </td>
+            <td>
+              <button class="block-btn"><a href="user.html">حذف</a></button>            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="creator-info">
+                <a href="view-recipe.html"><span class="creator-name">كنافة</span>
+                <img src="images/arrow.svg" class="recipe-arrow" alt="">
+              </a>
+              </div>
+            </td>
+            <td>
+              <img class="thumb-img" src="images/kunafa.jpg" alt="كنافة">
+            </td>
+            <td>
+              <button class="block-btn"><a href="user.html">حذف</a></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </section>
+
+  </div>
+ <footer class="site-footer" role="contentinfo">
+  <div class="container footer-inner">
+
+    <!-- عمود: نبذة -->
+    <div class="footer-col footer-about">
+      <div class="footer-brand">
+        <img src="images/logo.png" alt="شعار سُفرة" class="footer-logo">
+        <h3 class="footer-title">سُفرة</h3>
+      </div>
+      <p class="footer-text">
+        منصة وصفات رمضانية تساعدك توصل لوصفات الإفطار والسحور بطريقة مرتبة وبسيطة.
+      </p>
+    </div>
+
+    
+
+    <!-- عمود: استكشاف -->
+    <div class="footer-col">
+      <h4 class="footer-heading">استكشاف</h4>
+      <ul class="footer-links">
+        <li><a href="index.html">الرئيسية</a></li>
+        <li><a href="my-recipes.html">وصفاتي</a></li>
+        <li><a href="add-recipe.html">إضافة وصفة</a></li>
+        <li><a href="login.html">تسجيل الدخول</a></li>
+      </ul>
+    </div>
+	
+	<!-- عمود: التصنيفات -->
+    <div class="footer-col">
+      <h4 class="footer-heading">التصنيفات</h4>
+      <ul class="footer-links">
+        <li><a href="my-recipes.html">إفطار</a></li>
+        <li><a href="my-recipes.html">سحور</a></li>
+        <li><a href="my-recipes.html">حلويات</a></li>
+      </ul>
+    </div>
+
+    <!-- عمود: تواصل -->
+    <div class="footer-col">
+      <h4 class="footer-heading">تواصل معنا</h4>
+
+      <div class="footer-social">
+        <a class="social-btn" href="#" aria-label="انستقرام">IG</a>
+        <a class="social-btn" href="#" aria-label="إكس">X</a>
+        <a class="social-btn" href="#" aria-label="فيسبوك">f</a>
+        <a class="social-btn" href="#" aria-label="يوتيوب">▶</a>
+      </div>
+
+      <p class="footer-mini">
+        البريد: <a href="mailto:sufrah@example.com">sufrah@example.com</a>
+      </p>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container footer-bottom-inner">
+      <small>© 2026 سُفرة .</small>
+      <small>صُنع بـ <span aria-hidden="true">♥</span> لرمضان</small>
+    </div>
+  </div>
+</footer>
+
+  <!-- اربطي ملف الـ JS -->
+  <script src="user.js"></script>
+</body>
+</html>

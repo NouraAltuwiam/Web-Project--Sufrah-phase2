@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>سُفره | الصفحة الرئيسية</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="map-styles-improved.css" />
+</head>
+
+<body>
+
+  <!-- Header Full Width -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <!-- الشعار أقصى اليمين -->
+      <div id="logo">
+        <img src="images/logo.png" alt="Logo">
+        <span>سُفــــرة</span>
+      </div>
+      
+      <nav class="nav">
+        <a class="nav-chip" href="reels.html">مقاطع قصيرة</a>
+        <a class="nav-chip" href="login.html">تسجيل الدخول</a>
+        <a class="nav-chip" href="signup.html">إنشاء حساب</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Page Content -->
+  <div class="container">
+    
+    <!-- Welcome Section -->
+    <section class="welcome-section">
+      <div class="welcome-inner">
+        <div class="welcome-logo">
+          <img src="images/logo.png" alt="شعار سُفرة" class="welcome-logo-img">
+        </div>
+        
+        <h1 class="welcome-title">🌙 مرحبًا بكم في سُفره</h1>
+        <p class="welcome-subtitle">
+          منصة وصفات رمضانية تُسهّل الوصول إلى وصفات الإفطار والسحور بطريقة منظمة وبسيطة.
+          اكتشف وصفات جديدة، شارك تجاربك، واستمتع بأجواء رمضان معنا.
+        </p>
+        
+        <div class="welcome-actions">
+          <a class="welcome-btn primary" href="login.html">ابدأ الآن</a>
+          <a class="welcome-btn secondary" href="#reels">استكشف المقاطع</a>
+        </div>
+        
+        <p class="welcome-note">سجّل الدخول للوصول إلى جميع الميزات والمحتوى الحصري</p>
+      </div>
+    </section>
+
+        <!-- ramadan-countdown-section -->
+<section class="ramadan-countdown-section">
+  <div class="ramadan-countdown-card">
+
+    <h3 class="ramadan-title">عداد رمضان</h3>
+
+    <div class="ramadan-boxes">
+      <div class="ramadan-box" id="dayTens">0</div>
+      <div class="ramadan-box" id="dayOnes">0</div>
+    </div>
+
+    <p class="ramadan-text" id="ramadanText">...</p>
+
+  </div>
+</section>
+    <!-- Reels Section -->
+    <section class="reels-section" id="reels">
+      <div class="section-header">
+        <h2 class="section-title"> مقاطع الوصفات القصيرة</h2>
+        <p class="section-subtitle">شاهد وصفات سريعة مثالية لأيام رمضان المزدحمة</p>
+      </div>
+
+      <div class="reels-grid">
+        
+        <!-- Reel Card 1 -->
+        <div class="reel-card">
+          <div class="reel-header">
+            <span class="reel-category">إفطار</span>
+          </div>
+          <div class="reel-thumbnail">
+            <img src="images/حريره.jpg" alt="شوربه" class="reel-thumbnail-img">
+            <div class="play-icon">▶</div>
+          </div>
+          <div class="reel-content">
+            <h3 class="reel-title">حساء الحريرة المغربي التقليدي</h3>
+            <div class="reel-stats">
+              <span class="reel-stat">❤️ 342</span>
+              <span class="reel-stat">⏱️ 30s</span>
+            </div>
+            <p class="reel-description">وصفة مغربية شهيرة للإفطار في رمضان</p>
+          </div>
+        </div>
+
+        <!-- Reel Card 2 -->
+        <div class="reel-card">
+          <div class="reel-header">
+            <span class="reel-category">سحور</span>
+          </div>
+          <div class="reel-thumbnail">
+            <img src="images/سليق.jpg" alt="سليق" class="reel-thumbnail-img">
+            <div class="play-icon">▶</div>
+          </div>
+          <div class="reel-content">
+            <h3 class="reel-title">سليق بأسرع طريقه</h3>
+            <div class="reel-stats">
+              <span class="reel-stat">❤️ 189</span>
+              <span class="reel-stat">⏱️ 30s</span>
+            </div>
+            <p class="reel-description">طبق مثالي لوجبة السحور</p>
+          </div>
+        </div>
+
+        <!-- Reel Card 3 -->
+        <div class="reel-card">
+          <div class="reel-header">
+            <span class="reel-category">حلويات</span>
+            <span class="reel-badge">صحي</span>
+          </div>
+          <div class="reel-thumbnail">
+            <img src="images/كرات تمر.jpg" alt="سليق" class="reel-thumbnail-img">
+            <div class="play-icon">▶</div>
+          </div>
+          <div class="reel-content">
+            <h3 class="reel-title">كرات التمر </h3>
+            <div class="reel-stats">
+              <span class="reel-stat">❤️ 198</span>
+              <span class="reel-stat">⏱️ 30s</span>
+            </div>
+            <p class="reel-description">كرات التمر خفيفة للإفطار</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-footer">
+        <a href="reels.html" class="view-all-btn">
+          عرض جميع المقاطع
+          <span class="arrow">←</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Map Section -->
+    <section class="map-section">
+      <h2 class="section-title">وصفات رمضانية من العالم الإسلامي</h2>
+      <p class="section-description">اكتشف نكهات رمضان المتنوعة من كل ركن في العالم الإسلامي واستمتع بتجربة الطعام الأصيل ✨</p>
+
+      <div class="map-container">
+        <img src="images/map.jpg" class="world-map" alt="خريطة العالم الإسلامي">
+
+        <!-- المغرب -->
+        <div class="map-point" data-code="MA"
+          style="top: 23%; left: 15%;"
+          onclick="showCard('المغرب','شوربة حريرة','images/harira.jpg')"></div>
+
+        <!-- الجزائر -->
+        <div class="map-point" data-code="DZ"
+          style="top: 28%; left: 31%;"
+          onclick="showCard('الجزائر',' كسكس','images/couscus.jpg')"></div>
+
+        <!-- مصر -->
+        <div class="map-point" data-code="EG"
+          style="top: 30%; left: 62%;"
+          onclick="showCard('مصر','كنافة','images/kunafa.jpg')"></div>
+
+        <!-- الاردن -->
+        <div class="map-point" data-code="JO"
+          style="top: 14%; left: 68%;"
+          onclick="showCard('الاردن','منسف','images/mansaf.jpg')"></div>
+
+        <!-- ليبيا -->
+        <div class="map-point" data-code="LY"
+          style="top: 28%; left: 47%;"
+          onclick="showCard('ليبيا','البازين ','images/bazin.jpg')"></div>
+
+        <!-- السعودية -->
+        <div class="map-point" data-code="KSA"
+          style="top: 32%; left: 79%;"
+          onclick="showCard('المملكة العربية السعودية','كبسة','images/kabsa.jpg')"></div>
+
+        <!-- الإمارات -->
+        <div class="map-point" data-code="UAE"
+          style="top: 32%; left: 89%;"
+          onclick="showCard('الإمارات العربية المتحدة','هريس','images/harees.jpg')"></div>
+
+        <!-- إيران -->
+        <div class="map-point" data-code="IR"
+          style="top: 15%; left: 90%;"
+          onclick="showCard('إيران','آش رشتة','images/ash.jpg')"></div>
+
+        <!-- باكستان -->
+        <div class="map-point" data-code="PK"
+          style="top: 20%; left: 98.7%;"
+          onclick="showCard('باكستان',' دال وخبز','images/dal.jpg')"></div>
+
+        <!-- السودان -->
+        <div class="map-point" data-code="SD"
+          style="top: 55%; left: 62%;"
+          onclick="showCard('السودان','عصيدة','images/asida.jpg')"></div>
+
+        <!-- العراق -->
+        <div class="map-point" data-code="IRQ"
+          style="top: 12%; left: 76%;"
+          onclick="showCard('العراق','مسكوف','images/masgouf.jpg')"></div>
+
+        <!-- الصومال -->
+        <div class="map-point" data-code="SO"
+          style="top: 74%; left: 81.9%;"
+          onclick="showCard('الصومال','سمبوسة صوماليه','images/samosa.jpg')"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- خلفية شفافة للكرت -->
+  <div class="card-overlay" id="cardOverlay" onclick="closeCard()"></div>
+
+  <!-- بطاقة الوصفة المنبثقة -->
+  <div class="recipe-card" id="recipeCard">
+    <span class="close" onclick="closeCard()">×</span>
+    <img id="cardImg" src="" alt="">
+    <div class="recipe-card-content">
+      <h3 id="cardTitle">عنوان الوصفة</h3>
+      <p id="cardDesc">وصف الطبق</p>
+    <a href="view-recipe.html" class="recipe-card-btn">استكشف الوصفة</a>
+    </div>
+  </div>
+
+  <!-- Footer موحد -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container footer-inner">
+
+      <!-- عمود: نبذة -->
+      <div class="footer-col footer-about">
+        <div class="footer-brand">
+          <img src="images/logo.png" alt="شعار سُفرة" class="footer-logo">
+          <h3 class="footer-title">سُفرة 🌙</h3>
+        </div>
+        <p class="footer-text">
+          منصة وصفات رمضانية تساعدك توصل لوصفات الإفطار والسحور بطريقة مرتبة وبسيطة.
+        </p>
+      </div>
+
+      <!-- عمود: استكشاف -->
+      <div class="footer-col">
+        <h4 class="footer-heading">استكشاف</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">الرئيسية</a></li>
+          <li><a href="reels.html">مقاطع قصيرة</a></li>
+          <li><a href="my-recipes.html">وصفاتي</a></li>
+          <li><a href="add-recipe.html">إضافة وصفة</a></li>
+          <li><a href="login.html">تسجيل الدخول</a></li>
+        </ul>
+      </div>
+    
+      <!-- عمود: التصنيفات -->
+      <div class="footer-col">
+        <h4 class="footer-heading">التصنيفات</h4>
+        <ul class="footer-links">
+          <li><a href="my-recipes.html">إفطار</a></li>
+          <li><a href="my-recipes.html">سحور</a></li>
+          <li><a href="my-recipes.html">حلويات</a></li>
+        </ul>
+      </div>
+
+      <!-- عمود: تواصل -->
+      <div class="footer-col">
+        <h4 class="footer-heading">تواصل معنا</h4>
+
+        <div class="footer-social">
+          <a class="social-btn" href="#" aria-label="انستقرام">IG</a>
+          <a class="social-btn" href="#" aria-label="إكس">X</a>
+          <a class="social-btn" href="#" aria-label="فيسبوك">f</a>
+          <a class="social-btn" href="#" aria-label="يوتيوب">▶</a>
+        </div>
+
+        <p class="footer-mini">
+          البريد: <a href="mailto:sufrah@example.com">sufrah@example.com</a>
+        </p>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <small>© 2026 سُفرة . جميع الحقوق محفوظة</small>
+        <small>صُنع بـ <span aria-hidden="true">♥</span> لرمضان 🌙⭐</small>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const recipeCard = document.getElementById('recipeCard');
+    const cardOverlay = document.getElementById('cardOverlay');
+    const cardTitle = document.getElementById('cardTitle');
+    const cardDesc = document.getElementById('cardDesc');
+    const cardImg = document.getElementById('cardImg');
+
+    function showCard(country, dish, img) {
+      cardTitle.innerText = country;
+      cardDesc.innerText = dish;
+      cardImg.src = img;
+      recipeCard.style.display = "block";
+      cardOverlay.classList.add('active');
+      // منع التمرير في الخلفية
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCard() {
+      recipeCard.style.display = "none";
+      cardOverlay.classList.remove('active');
+      // استعادة التمرير
+      document.body.style.overflow = 'auto';
+    }
+
+    // إغلاق عند الضغط على ESC
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeCard();
+      }
+    });
+  </script>
+  <script src="scroll.js"></script>
+
+</body>
+<script>
+  const ramadanStart = new Date("2026-02-19"); // ✨ تاريخ صحيح وواضح
+
+  function updateRamadanCounter(){
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const start = new Date(
+      ramadanStart.getFullYear(),
+      ramadanStart.getMonth(),
+      ramadanStart.getDate()
+    );
+
+    const daysLeft = Math.ceil((start - today) / (1000 * 60 * 60 * 24));
+
+    const tens = document.getElementById("dayTens");
+    const ones = document.getElementById("dayOnes");
+    const text = document.getElementById("ramadanText");
+
+    if (daysLeft > 0) {
+      const s = String(daysLeft).padStart(2,"0");
+      tens.textContent = s[0];
+      ones.textContent = s[1];
+      text.textContent = ` تبقى ${daysLeft} يوم على رمضان`;
+    } else {
+      const ramadanDay = Math.abs(daysLeft) + 1;
+      const s = String(ramadanDay).padStart(2,"0");
+      tens.textContent = s[0];
+      ones.textContent = s[1];
+      text.textContent = ` اليوم ${ramadanDay} من رمضان`;
+    }
+  }
+
+  updateRamadanCounter();
+  setInterval(updateRamadanCounter, 60 * 60 * 1000);
+</script>
+</html>

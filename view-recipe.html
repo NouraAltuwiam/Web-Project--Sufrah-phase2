@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>سفرة - عرض الوصفة</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- Header Full Width -->
+  <header class="site-header">
+  <div class="container header-inner">
+
+    <div id="logo">
+      <img src="images/logo.png" alt="Logo">
+      <span>سُفــــرة</span>
+    </div>
+
+    
+    <nav class="nav">
+      <a class="nav-chip" href="user.html">صفحة المستخدم</a>
+      <a class="nav-chip" href="my-recipes.html">وصفاتي</a>
+    </nav>
+    
+    <a href="user.html" class="sign-out">رجوع</a>
+  </div>
+</header>
+
+  <div class="container">
+
+    <!-- Title -->
+    <section class="welcome">
+      <h1>وصفة: <span id="recipeName">كيكة الشوكولاتة الفاخرة</span></h1>
+    </section>
+
+    <!-- Top Grid: details + stats/actions -->
+    <div class="main-grid">
+
+      <!-- Recipe Details Card -->
+      <section class="user-info-card">
+
+        <!-- Recipe header -->
+        <div class="recipe-top">
+          <div class="recipe-photo">
+            <img src="images/chocolate Cake.JPG" alt="صورة الوصفة" class="recipe-photo-img">
+          </div>
+
+          <div class="recipe-head-info">
+            <h2 class="recipe-title" id="recipeTitle">كيكة الشوكولاتة الفاخرة</h2>
+
+            <div class="recipe-actions">
+              <button class="filter-button" type="button">إضافة للمفضلة ❤️</button>
+              <button class="filter-button" type="button">إعجاب 👍</button>
+              <button class="filter-button" type="button">إبلاغ 🚩</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Creator + Category + Description -->
+        <div class="info-grid">
+
+          <div class="info-item">
+            <div class="info-icon">👩‍🍳</div>
+            <div class="info-content">
+              <div class="info-label">صاحب الوصفة</div>
+              <div class="info-value">
+                <div class="creator-info">
+                  <img src="images/pink-girl.webp" class="creator-photo" alt="نورة">
+                  <span class="creator-name">نورة أحمد</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">🏷️</div>
+            <div class="info-content">
+              <div class="info-label">الفئة</div>
+              <div class="info-value">
+                <span class="category-badge">حلويات</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">📝</div>
+            <div class="info-content">
+              <div class="info-label">الوصف</div>
+              <div class="info-value" id="recipeDesc">
+                كيكة غنية بالشوكولاتة بطعم فاخر  🎂
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- Side Card: quick info -->
+      <section class="my-recipes-card">
+        <h3>معلومات سريعة</h3>
+
+        <div class="stats-boxes">
+
+          <div class="stat-box">
+            <div class="stat-number">15</div>
+            <div class="stat-label">عدد الإعجابات</div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-number">45</div>
+            <div class="stat-label">عدد المفضلة</div>
+          </div>
+
+          <div class="stat-box">
+            <div class="stat-number">8</div>
+            <div class="stat-label">عدد التعليقات</div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Ingredients -->
+    <section class="all-recipes-section">
+      <h2 class="section-title">المكونات</h2>
+
+      <table class="recipes-table">
+        <thead>
+          <tr>
+            <th>المكوّن</th>
+            <th>الكمية</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>دقيق</td>
+            <td>2 كوب</td>
+          </tr>
+          <tr>
+            <td>سكر</td>
+            <td>1 كوب</td>
+          </tr>
+          <tr>
+            <td>بيض</td>
+            <td>3 حبات</td>
+          </tr>
+          <tr>
+            <td>كاكاو</td>
+            <td>1/2 كوب</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="healthy-box">
+  <div class="healthy-num">1</div>
+
+  <div class="healthy-content">
+    <div class="healthy-title">بدائل صحية (اختياري)🌿</div>
+    <div class="healthy-text">يُفضل استبدال السكر بالعسل (بنفس الكمية أو أقل حسب الرغبة).</div>
+  </div>
+</div>
+    </section>
+
+    <!-- Instructions -->
+    <section class="all-recipes-section">
+      <h2 class="section-title">طريقة التحضير</h2>
+
+      <div class="recipe-steps">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-text">اخلطي المكونات الجافة معًا.</div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-text">أضيفي البيض وامزجي حتى يتجانس الخليط.</div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-text">اسكبي الخليط في قالب مدهون.</div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">4</div>
+          <div class="step-text">اخبزي في فرن 180° لمدة 25–30 دقيقة.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Video -->
+    <section class="all-recipes-section">
+      <h2 class="section-title">الفيديو</h2>
+
+      <div class="filter-bar" style="justify-content: space-between;">
+        <div style="font-weight:600; color:#B56A63;">
+  رابط الفيديو:
+  <a class="recipe-name-link" href="https://youtu.be/W6D63sXlVto?si=MWganZtkKYmCmSwv" target="_blank" rel="noopener">
+    اضغط هنا لمشاهدة الفيديو
+  </a>
+</div>
+      </div>
+
+     
+      
+    </section>
+
+    <!-- Comments -->
+    <section class="favorites-section">
+      <h2 class="section-title">
+        التعليقات
+      </h2>
+
+      <!-- Add comment -->
+      <div class="comment-box">
+        <input type="text" class="comment-input" placeholder="اكتب تعليقك هنا..." />
+        <button class="filter-button" type="button">إضافة تعليق</button>
+      </div>
+
+      <!-- Comments list -->
+      <div class="comments-list">
+
+        <div class="comment-item">
+          <div class="creator-info">
+            <img src="images/pink-girl.webp" class="creator-photo" alt="سارة">
+            <span class="creator-name">سارة محمد</span>
+           <div class="comment-date">2-2-2026</div>
+
+          </div>
+          <p class="comment-text">مرررره لذيذة! جربتها وطلعت ممتازة 😍</p>
+        </div>
+
+        <div class="comment-item">
+          <div class="creator-info">
+            <img src="images/orang-girl.webp" class="creator-photo" alt="ليلى">
+            <span class="creator-name">ليلى خالد</span>
+           <div class="comment-date">28-1-2026</div>
+
+          </div>
+          <p class="comment-text">هل ينفع أستبدل السكر بعسل؟</p>
+
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+ <footer class="site-footer" role="contentinfo">
+  <div class="container footer-inner">
+
+    <!-- عمود: نبذة -->
+    <div class="footer-col footer-about">
+      <div class="footer-brand">
+        <img src="images/logo.png" alt="شعار سُفرة" class="footer-logo">
+        <h3 class="footer-title">سُفرة</h3>
+      </div>
+      <p class="footer-text">
+        منصة وصفات رمضانية تساعدك توصل لوصفات الإفطار والسحور بطريقة مرتبة وبسيطة.
+      </p>
+    </div>
+
+    
+
+    <!-- عمود: استكشاف -->
+    <div class="footer-col">
+      <h4 class="footer-heading">استكشاف</h4>
+      <ul class="footer-links">
+        <li><a href="index.html">الرئيسية</a></li>
+        <li><a href="my-recipes.html">وصفاتي</a></li>
+        <li><a href="add-recipe.html">إضافة وصفة</a></li>
+        <li><a href="login.html">تسجيل الدخول</a></li>
+      </ul>
+    </div>
+	
+	<!-- عمود: التصنيفات -->
+    <div class="footer-col">
+      <h4 class="footer-heading">التصنيفات</h4>
+      <ul class="footer-links">
+        <li><a href="my-recipes.html">إفطار</a></li>
+        <li><a href="my-recipes.html">سحور</a></li>
+        <li><a href="my-recipes.html">حلويات</a></li>
+      </ul>
+    </div>
+
+    <!-- عمود: تواصل -->
+    <div class="footer-col">
+      <h4 class="footer-heading">تواصل معنا</h4>
+
+      <div class="footer-social">
+        <a class="social-btn" href="#" aria-label="انستقرام">IG</a>
+        <a class="social-btn" href="#" aria-label="إكس">X</a>
+        <a class="social-btn" href="#" aria-label="فيسبوك">f</a>
+        <a class="social-btn" href="#" aria-label="يوتيوب">▶</a>
+      </div>
+
+      <p class="footer-mini">
+        البريد: <a href="mailto:sufrah@example.com">sufrah@example.com</a>
+      </p>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container footer-bottom-inner">
+      <small>© 2026 سُفرة .</small>
+      <small>صُنع بـ <span aria-hidden="true">♥</span> لرمضان</small>
+    </div>
+  </div>
+</footer>
+
+</body>
+
+</html>
