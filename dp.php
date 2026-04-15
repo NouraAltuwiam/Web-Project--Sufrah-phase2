@@ -1,12 +1,14 @@
 <?php
-$host = "localhost";
-$dbname = "recipes_db";
+// Database connection file using PDO
+$host     = "localhost";
+$dbname   = "sufrah_db";
 $username = "root";
 $password = "";
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     die("فشل الاتصال بقاعدة البيانات: " . $e->getMessage());
 }

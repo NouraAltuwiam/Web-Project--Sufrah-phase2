@@ -1,40 +1,29 @@
 <?php
-// ===================================================
-// unblock_user.php - إلغاء حظر مستخدم
-// يحذف المستخدم من جدول blockeduser فقط
-// ===================================================
+// unblock_user.php
+// Removes a user from the blocked users table
+// Requirement 11d: Unblock link goes to this page
 
 session_start();
+require_once 'dp.php';
 
-// تحقق أن المستخدم أدمن
-if (!isset($_SESSION['userID']) || $_SESSION['userType'] !== 'admin') {
-    header("Location: login.php?error=غير مصرح لك");
+// Only admins can unblock users
+if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'admin') {
+    header("Location: login.php?error=" . urlencode("غير مصرح لك"));
     exit();
 }
 
-// تحقق أن ID المستخدم المحظور موجود في الرابط
-if (!isset($_GET['id'])) {
+// Require a valid blocked user ID in the URL
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header("Location: admin.php");
     exit();
 }
 
 $blockedID = (int) $_GET['id'];
 
-// اتصال بالداتابيس
-$conn = new mysqli("localhost", "root", "", "sufrah_db");
-if ($conn->connect_error) {
-    die("فشل الاتصال: " . $conn->connect_error);
-}
+// Remove the user from the blocked users table
+$stmt = $pdo->prepare("DELETE FROM blockeduser WHERE id = ?");
+$stmt->execute([$blockedID]);
 
-// حذف المستخدم من جدول blockeduser
-$stmt = $conn->prepare("DELETE FROM blockeduser WHERE id = ?");
-$stmt->bind_param("i", $blockedID);
-$stmt->execute();
-$stmt->close();
-
-$conn->close();
-
-// الرجوع لصفحة الأدمن
 header("Location: admin.php");
 exit();
 ?>

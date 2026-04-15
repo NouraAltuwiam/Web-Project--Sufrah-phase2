@@ -1,28 +1,22 @@
 <?php
-// ===================================================
-// handle_report.php - معالجة البلاغات (حظر أو رفض)
-// هذه صفحة منفصلة للمعالجة فقط، لا تعرض واجهة
-// ===================================================
+// handle_report.php
+// Handles admin report actions: block user or dismiss report
+// Requirement 11c: Separate PHP page for processing report actions
 
 session_start();
+require_once 'dp.php';
 
-// تحقق أن المستخدم أدمن
-if (!isset($_SESSION['userID']) || $_SESSION['userType'] !== 'admin') {
-    header("Location: login.php?error=غير مصرح لك");
+// Only admins can access this page
+if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'admin') {
+    header("Location: login.php?error=" . urlencode("غير مصرح لك"));
     exit();
 }
 
-// تحقق أن البيانات المطلوبة وصلت
+// Must be POST with all required fields
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' ||
     !isset($_POST['action'], $_POST['reportID'], $_POST['recipeID'], $_POST['ownerID'])) {
     header("Location: admin.php");
     exit();
-}
-
-// اتصال بالداتابيس
-$conn = new mysqli("localhost", "root", "", "sufrah_db");
-if ($conn->connect_error) {
-    die("فشل الاتصال: " . $conn->connect_error);
 }
 
 $action   = $_POST['action'];
@@ -30,37 +24,38 @@ $reportID = (int) $_POST['reportID'];
 $recipeID = (int) $_POST['recipeID'];
 $ownerID  = (int) $_POST['ownerID'];
 
-// ===== إذا الإجراء هو حظر المستخدم =====
+// Requirement 11c: If action is block, delete user data and add to blocked table
 if ($action === 'block') {
 
-    // 1) جلب معلومات المستخدم قبل حذفه (لإضافته لجدول blockeduser)
-    $stmt = $conn->prepare("SELECT firstName, lastName, emailAddress FROM user WHERE id = ?");
-    $stmt->bind_param("i", $ownerID);
-    $stmt->execute();
-    $userResult = $stmt->get_result();
-    $userData   = $userResult->fetch_assoc();
-    $stmt->close();
+    // Get user info before deleting
+    $stmtUser = $pdo->prepare("SELECT firstName, lastName, emailAddress FROM user WHERE id = ?");
+    $stmtUser->execute([$ownerID]);
+    $userData = $stmtUser->fetch();
 
     if ($userData) {
 
-        // 2) جلب كل وصفات هذا المستخدم لحذف ملفاتها
-        $recipesStmt = $conn->prepare("SELECT id, photoFileName, videoFilePath FROM recipe WHERE userID = ?");
-        $recipesStmt->bind_param("i", $ownerID);
-        $recipesStmt->execute();
-        $recipesResult = $recipesStmt->get_result();
+        // Get all recipes by this user to delete their files
+        $stmtRecipes = $pdo->prepare("SELECT id, photoFileName, videoFilePath FROM recipe WHERE userID = ?");
+        $stmtRecipes->execute([$ownerID]);
+        $recipes = $stmtRecipes->fetchAll();
 
-        while ($rec = $recipesResult->fetch_assoc()) {
-            $rID = $rec['id'];
+        foreach ($recipes as $rec) {
+            $rID = (int) $rec['id'];
 
-            // حذف ملف صورة الوصفة من السيرفر
+            // Delete recipe photo file from server
             if (!empty($rec['photoFileName'])) {
                 $photoPath = "uploads/recipes/" . $rec['photoFileName'];
                 if (file_exists($photoPath)) {
                     unlink($photoPath);
                 }
+                // Also check in images folder
+                $photoPath2 = "images/" . $rec['photoFileName'];
+                if (file_exists($photoPath2)) {
+                    unlink($photoPath2);
+                }
             }
 
-            // حذف ملف فيديو الوصفة من السيرفر
+            // Delete recipe video file from server
             if (!empty($rec['videoFilePath'])) {
                 $videoPath = "uploads/videos/" . $rec['videoFilePath'];
                 if (file_exists($videoPath)) {
@@ -68,47 +63,35 @@ if ($action === 'block') {
                 }
             }
 
-            // حذف البيانات المرتبطة بكل وصفة (الترتيب مهم بسبب foreign keys)
-            $conn->query("DELETE FROM comment     WHERE recipeID = $rID");
-            $conn->query("DELETE FROM likes       WHERE recipeID = $rID");
-            $conn->query("DELETE FROM favourites  WHERE recipeID = $rID");
-            $conn->query("DELETE FROM report      WHERE recipeID = $rID");
-            $conn->query("DELETE FROM ingredients WHERE recipeID = $rID");
-            $conn->query("DELETE FROM instructions WHERE recipeID = $rID");
+            // Delete all data related to this recipe (order matters due to foreign keys)
+            $pdo->prepare("DELETE FROM comment      WHERE recipeID = ?")->execute([$rID]);
+            $pdo->prepare("DELETE FROM likes        WHERE recipeID = ?")->execute([$rID]);
+            $pdo->prepare("DELETE FROM favourites   WHERE recipeID = ?")->execute([$rID]);
+            $pdo->prepare("DELETE FROM report       WHERE recipeID = ?")->execute([$rID]);
+            $pdo->prepare("DELETE FROM ingredients  WHERE recipeID = ?")->execute([$rID]);
+            $pdo->prepare("DELETE FROM instructions WHERE recipeID = ?")->execute([$rID]);
         }
-        $recipesStmt->close();
 
-        // 3) حذف كل وصفات المستخدم من جدول recipe
-        $delRecipes = $conn->prepare("DELETE FROM recipe WHERE userID = ?");
-        $delRecipes->bind_param("i", $ownerID);
-        $delRecipes->execute();
-        $delRecipes->close();
+        // Delete all recipes by this user
+        $pdo->prepare("DELETE FROM recipe WHERE userID = ?")->execute([$ownerID]);
 
-        // 4) إضافة المستخدم لجدول blockeduser
-        $blockStmt = $conn->prepare(
-            "INSERT INTO blockeduser (firstName, lastName, emailAddress) VALUES (?, ?, ?)"
-        );
-        $blockStmt->bind_param("sss", $userData['firstName'], $userData['lastName'], $userData['emailAddress']);
-        $blockStmt->execute();
-        $blockStmt->close();
+        // Add user to the blocked users table
+        $stmtBlock = $pdo->prepare("INSERT INTO blockeduser (firstName, lastName, emailAddress) VALUES (?, ?, ?)");
+        $stmtBlock->execute([$userData['firstName'], $userData['lastName'], $userData['emailAddress']]);
 
-        // 5) حذف المستخدم من جدول user
-        $delUser = $conn->prepare("DELETE FROM user WHERE id = ?");
-        $delUser->bind_param("i", $ownerID);
-        $delUser->execute();
-        $delUser->close();
+        // Delete user from the users table
+        $pdo->prepare("DELETE FROM user WHERE id = ?")->execute([$ownerID]);
     }
 }
 
-// ===== حذف البلاغ في كلتا الحالتين (حظر أو رفض) =====
-$delReport = $conn->prepare("DELETE FROM report WHERE id = ?");
-$delReport->bind_param("i", $reportID);
-$delReport->execute();
-$delReport->close();
+// Always delete the report whether we blocked or dismissed
+// (reportID may have already been deleted by the cascade above if action was block)
+try {
+    $pdo->prepare("DELETE FROM report WHERE id = ?")->execute([$reportID]);
+} catch (Exception $e) {
+    // Report was already deleted by cascade delete above
+}
 
-$conn->close();
-
-// الرجوع لصفحة الأدمن
 header("Location: admin.php");
 exit();
 ?>
