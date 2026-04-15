@@ -44,20 +44,15 @@ if ($action === 'block') {
 
             // Delete recipe photo file from server
             if (!empty($rec['photoFileName'])) {
-                $photoPath = "uploads/recipes/" . $rec['photoFileName'];
+                $photoPath = "images/" . $rec['photoFileName'];
                 if (file_exists($photoPath)) {
                     unlink($photoPath);
-                }
-                // Also check in images folder
-                $photoPath2 = "images/" . $rec['photoFileName'];
-                if (file_exists($photoPath2)) {
-                    unlink($photoPath2);
                 }
             }
 
             // Delete recipe video file from server
             if (!empty($rec['videoFilePath'])) {
-                $videoPath = "uploads/videos/" . $rec['videoFilePath'];
+                $videoPath = "videos/" . $rec['videoFilePath'];
                 if (file_exists($videoPath)) {
                     unlink($videoPath);
                 }

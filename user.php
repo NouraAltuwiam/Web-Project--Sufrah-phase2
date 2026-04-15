@@ -25,11 +25,7 @@ if (!$user) {
 
 $full_name  = trim($user['firstName'] . " " . $user['lastName']);
 $photo_file = !empty($user['photoFileName']) ? $user['photoFileName'] : "default-user.png";
-$photo_path = "images/users/" . $photo_file;
-// Fallback to images/ root if not in users subfolder
-if (!file_exists($photo_path)) {
-    $photo_path = "images/" . $photo_file;
-}
+$photo_path = "images/" . $photo_file;
 
 // Requirement 6c: Total recipes for this user
 $stmt_total_recipes = $pdo->prepare("SELECT COUNT(*) AS total_recipes FROM recipe WHERE userID = ?");
@@ -145,7 +141,7 @@ $favourites = $stmt_fav->fetchAll(PDO::FETCH_ASSOC);
       <section class="user-info-card">
         <div class="user-header">
           <div class="user-photo">
-            <img src="<?php echo htmlspecialchars($photo_path); ?>" alt="User Avatar" style="width:100%;height:100%;object-fit:cover;">
+            <img src="<?php echo htmlspecialchars($photo_path); ?>" alt="User Avatar" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='images/default.png'">
           </div>
           <div class="user-title">
             <h2><?php echo htmlspecialchars($full_name); ?></h2>
@@ -245,10 +241,10 @@ $favourites = $stmt_fav->fetchAll(PDO::FETCH_ASSOC);
                 </td>
                 <td>
                   <div class="creator-info">
-                    <img src="images/<?php echo htmlspecialchars(!empty($recipe['userPhoto']) ? $recipe['userPhoto'] : 'default-user.png'); ?>"
+                    <img src="images/<?php echo htmlspecialchars(!empty($recipe['userPhoto']) ? $recipe['userPhoto'] : 'default.png'); ?>"
                          class="creator-photo"
                          alt="<?php echo htmlspecialchars($recipe['firstName']); ?>"
-                         onerror="this.src='images/default-user.png'">
+                         onerror="this.src='images/default.png'">
                     <span class="creator-name">
                       <?php echo htmlspecialchars(trim($recipe['firstName'] . " " . $recipe['lastName'])); ?>
                     </span>

@@ -34,14 +34,9 @@ if (!$recipe) {
 
 // Delete recipe photo file from server
 if (!empty($recipe['photoFileName'])) {
-    $paths = [
-        "images/" . $recipe['photoFileName'],
-        "uploads/recipes/" . $recipe['photoFileName']
-    ];
-    foreach ($paths as $p) {
-        if (file_exists($p)) {
-            unlink($p);
-        }
+    $photoPath = "images/" . $recipe['photoFileName'];
+    if (file_exists($photoPath)) {
+        unlink($photoPath);
     }
 }
 

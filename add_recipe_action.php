@@ -32,7 +32,7 @@ if (!isset($_FILES['recipePhoto']) || $_FILES['recipePhoto']['error'] !== 0) {
     exit();
 }
 
-$photoUploadDir = "images/recipes/";
+$photoUploadDir = "images/";
 if (!is_dir($photoUploadDir)) {
     mkdir($photoUploadDir, 0777, true);
 }

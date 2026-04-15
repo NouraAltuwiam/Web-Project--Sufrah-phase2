@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Handle optional profile photo upload
     if ($error == "" && isset($_FILES['profileImg']) && $_FILES['profileImg']['error'] === 0) {
-        $uploadDir = "images/users/";
+        $uploadDir = "images/";
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }

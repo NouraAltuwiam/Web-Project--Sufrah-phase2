@@ -1,3 +1,6 @@
+/* Google Fonts - Cairo for Arabic, Playfair Display for Latin headings */
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Playfair+Display:wght@700&display=swap");
+
 /* ===== إعادة تعيين الأنماط الأساسية ===== */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #EFE1D4 0%, #F5EDE3 50%, #EFE1D4 100%); min-height: 100vh; direction: rtl; color: #333; }
@@ -1728,13 +1731,9 @@ button.link{
 }
 
 
-@font-face {
-  font-family: Handicrafts;
-  src: url("font/TheYearofHandicrafts-SemiBold.otf");
-}
 
 * {
-  font-family: Handicrafts, serif, Arial;
+  font-family: 'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif;
 }
 /* ===== Welcome Section الجديدة ===== */
 .welcome-section {
