@@ -61,7 +61,6 @@ $commentStmt->execute([$recipeId]);
 $comments = $commentStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Count totals
-$totalLikes     = (int) $pdo->prepare("SELECT COUNT(*) FROM likes WHERE recipeID = ?")->execute([$recipeId]) ? 0 : 0;
 $stmtLikeCount  = $pdo->prepare("SELECT COUNT(*) FROM likes WHERE recipeID = ?");
 $stmtLikeCount->execute([$recipeId]);
 $totalLikes = (int) $stmtLikeCount->fetchColumn();
