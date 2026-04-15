@@ -89,5 +89,5 @@ window.addEventListener('scroll', function() {
 // تشغيل الفحص عند تغيير حجم الشاشة
 window.addEventListener('resize', checkVisibility);
 
-// تشغيل مرة أولى بعد ثانية
-setTimeout(checkVisibility, 100);
+// تشغيل مرة أولى بأسرع وقت ممكن لتجنب القلطة
+setTimeout(checkVisibility, 0);

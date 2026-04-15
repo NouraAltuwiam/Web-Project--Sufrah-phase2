@@ -1,7 +1,6 @@
 <?php
-// Database connection file using PDO
 $host     = "localhost";
-$dbname   = "sufrah_db";
+$dbname   = "recipes_db";
 $username = "root";
 $password = "";
 

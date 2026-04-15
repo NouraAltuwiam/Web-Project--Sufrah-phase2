@@ -1,6 +1,3 @@
-/* Google Fonts - Cairo for Arabic, Playfair Display for Latin headings */
-@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Playfair+Display:wght@700&display=swap");
-
 /* ===== إعادة تعيين الأنماط الأساسية ===== */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #EFE1D4 0%, #F5EDE3 50%, #EFE1D4 100%); min-height: 100vh; direction: rtl; color: #333; }
@@ -1731,9 +1728,10 @@ button.link{
 }
 
 
+@importurl('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800;900&display=swap');
 
 * {
-  font-family: 'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-family: 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
 }
 /* ===== Welcome Section الجديدة ===== */
 .welcome-section {
@@ -3262,4 +3260,16 @@ td .reel-category  {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
+}
+
+/* ===== إصلاح القلطة عند التحميل (FOUC fix) ===== */
+.section-header,
+.reel-card,
+.map-section .section-title,
+.map-section .section-description,
+.map-container,
+.map-point,
+.view-all-btn {
+  will-change: opacity, transform;
+  backface-visibility: hidden;
 }

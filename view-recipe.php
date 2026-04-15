@@ -183,9 +183,9 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
               <div class="info-label">صاحب الوصفة</div>
               <div class="info-value">
                 <div class="creator-info">
-                  <img src="images/<?php echo htmlspecialchars($recipe['creatorPhoto'] ?: 'default-user.png'); ?>"
+                  <img src="images/<?php echo htmlspecialchars($recipe['creatorPhoto'] ?: 'default.png'); ?>"
                        class="creator-photo" alt="creator"
-                       onerror="this.src='images/default-user.png'">
+                       onerror="this.src='images/default.png'">
                   <span class="creator-name">
                     <?php echo htmlspecialchars($recipe['firstName'] . ' ' . $recipe['lastName']); ?>
                   </span>
@@ -305,9 +305,9 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
           <?php foreach ($comments as $c): ?>
             <div class="comment-item">
               <div class="creator-info">
-                <img src="images/<?php echo htmlspecialchars($c['commenterPhoto'] ?: 'default-user.png'); ?>"
+                <img src="images/<?php echo htmlspecialchars($c['commenterPhoto'] ?: 'default.png'); ?>"
                      class="creator-photo" alt="commenter"
-                     onerror="this.src='images/default-user.png'">
+                     onerror="this.src='images/default.png'">
                 <span class="creator-name">
                   <?php echo htmlspecialchars($c['firstName'] . ' ' . $c['lastName']); ?>
                 </span>
