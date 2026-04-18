@@ -69,7 +69,17 @@ if ($action === 'block') {
 
         // Delete all recipes by this user
         $pdo->prepare("DELETE FROM recipe WHERE userID = ?")->execute([$ownerID]);
+// Delete all recipes by this user
+        $pdo->prepare("DELETE FROM recipe WHERE userID = ?")->execute([$ownerID]);
 
+        // ← أضيفي هنا: حذف بيانات المستخدم على وصفات الآخرين
+        $pdo->prepare("DELETE FROM comment    WHERE userID = ?")->execute([$ownerID]);
+        $pdo->prepare("DELETE FROM likes      WHERE userID = ?")->execute([$ownerID]);
+        $pdo->prepare("DELETE FROM favourites WHERE userID = ?")->execute([$ownerID]);
+        $pdo->prepare("DELETE FROM report     WHERE userID = ?")->execute([$ownerID]);
+
+        // Add user to the blocked users table
+        $stmtBlock = $pdo->prepare("INSERT INTO blockeduser (firstName, lastName, emailAddress) VALUES (?, ?, ?)");
         // Add user to the blocked users table
         $stmtBlock = $pdo->prepare("INSERT INTO blockeduser (firstName, lastName, emailAddress) VALUES (?, ?, ?)");
         $stmtBlock->execute([$userData['firstName'], $userData['lastName'], $userData['emailAddress']]);
