@@ -1728,10 +1728,14 @@ button.link{
 }
 
 
-@importurl('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800;900&display=swap');
+@font-face {
+  font-family: Handicraft;
+  src: url("font/TheYearofHandicrafts-SemiBold.otf");
+
+}
 
 * {
-  font-family: 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
+  font-family: Handicraft, serif ,Arial;
 }
 /* ===== Welcome Section الجديدة ===== */
 .welcome-section {
