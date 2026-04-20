@@ -120,8 +120,8 @@ $reels = $stmtReels->fetchAll();
     <!-- Reels section - loaded from database -->
     <section class="reels-section" id="reels">
       <div class="section-header">
-        <h2 class="section-title">أحدث الوصفات</h2>
-        <p class="section-subtitle">استكشف أحدث الوصفات المضافة على المنصة</p>
+        <h2 class="section-title"> مقاطع الوصفات القصيرة</h2>
+        <p class="section-subtitle">شاهد وصفات سريعة مثالية لأيام رمضان المزدحمة</p>
       </div>
 
       <div class="reels-grid">
@@ -149,6 +149,7 @@ $reels = $stmtReels->fetchAll();
               <?php endif; ?>
               <div class="reel-stats">
                 <span class="reel-stat">❤️ <?= (int)$reel['totalLikes'] ?></span>
+                <span class="reel-stat">⏱️ 30s</span>
               </div>
               <p class="reel-description"><?= htmlspecialchars($reel['description']) ?></p>
             </div>

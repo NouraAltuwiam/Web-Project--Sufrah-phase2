@@ -1,11 +1,13 @@
 <?php
 // view-recipe.php
-// Requirement 10: Displays full recipe info with comments, like/favourite/report buttons
+// Requirement: Displays all recipe info. Shows favourite/like/report buttons
+//              only for regular users. Disables each button if already used.
+//              Includes a comment form that submits to add_comment.php.
 
 session_start();
 require 'dp.php';
 
-// Requirement 5: Only logged-in users can view recipes
+// Requirement: Only logged-in users can view recipes
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php?error=" . urlencode("You must be logged in to view recipes."));
     exit();
@@ -14,7 +16,7 @@ if (!isset($_SESSION['user_id'])) {
 $viewerId   = (int) $_SESSION['user_id'];
 $viewerType = $_SESSION['user_type'] ?? '';
 
-// Requirement 10a: Check the recipe ID from the query string
+// Requirement: Check the recipe ID from the query string
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header("Location: " . ($viewerType === 'admin' ? 'admin.php' : 'user.php'));
     exit();
@@ -22,7 +24,7 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $recipeId = (int) $_GET['id'];
 
-// Requirement 10b: Retrieve all recipe info and creator info from the database
+// Requirement: Retrieve all recipe info from the database
 $stmtRecipe = $pdo->prepare("
     SELECT r.*, u.firstName, u.lastName, u.photoFileName AS creatorPhoto, u.id AS creatorID,
            rc.categoryName
@@ -44,7 +46,7 @@ $ingStmt = $pdo->prepare("SELECT ingredientName, ingredientQuantity FROM ingredi
 $ingStmt->execute([$recipeId]);
 $ingredients = $ingStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Retrieve instructions ordered by stepOrder
+// Retrieve instructions ordered by step number
 $instStmt = $pdo->prepare("SELECT step, stepOrder FROM instructions WHERE recipeID = ? ORDER BY stepOrder ASC");
 $instStmt->execute([$recipeId]);
 $instructions = $instStmt->fetchAll(PDO::FETCH_ASSOC);
@@ -60,8 +62,8 @@ $commentStmt = $pdo->prepare("
 $commentStmt->execute([$recipeId]);
 $comments = $commentStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Count totals
-$stmtLikeCount  = $pdo->prepare("SELECT COUNT(*) FROM likes WHERE recipeID = ?");
+// Count total likes and favourites
+$stmtLikeCount = $pdo->prepare("SELECT COUNT(*) FROM likes WHERE recipeID = ?");
 $stmtLikeCount->execute([$recipeId]);
 $totalLikes = (int) $stmtLikeCount->fetchColumn();
 
@@ -69,14 +71,14 @@ $stmtFavCount = $pdo->prepare("SELECT COUNT(*) FROM favourites WHERE recipeID = 
 $stmtFavCount->execute([$recipeId]);
 $totalFavs = (int) $stmtFavCount->fetchColumn();
 
-// Requirement 10d: Button states - only show if viewer is NOT the creator and NOT an admin
-$isCreator = ($viewerId === (int) $recipe['creatorID']);
-$isAdmin   = ($viewerType === 'admin');
+// Requirement: Only show action buttons if viewer is a regular user (not creator, not admin)
+$isCreator   = ($viewerId === (int) $recipe['creatorID']);
+$isAdmin     = ($viewerType === 'admin');
 $showButtons = (!$isCreator && !$isAdmin);
 
-// Check if viewer already liked, favourited, or reported this recipe
-$alreadyLiked = false;
-$alreadyFaved = false;
+// Requirement: Check if viewer already liked, favourited, or reported - disable button if so
+$alreadyLiked    = false;
+$alreadyFaved    = false;
 $alreadyReported = false;
 
 if ($showButtons) {
@@ -100,11 +102,12 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>سفرة | <?php echo htmlspecialchars($recipe['name']); ?></title>
+  <title>سفرة - عرض الوصفة</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
+  <!-- Header -->
   <header class="site-header">
     <div class="container header-inner">
       <div id="logo">
@@ -112,8 +115,8 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
         <span>سُفــــرة</span>
       </div>
       <nav class="nav">
-        <a class="nav-chip" href="<?php echo $backLink; ?>">
-          <?php echo ($viewerType === 'admin') ? 'لوحة الإدارة' : 'صفحة المستخدم'; ?>
+        <a class="nav-chip" href="<?= $backLink ?>">
+          <?= ($viewerType === 'admin') ? 'لوحة الإدارة' : 'صفحة المستخدم' ?>
         </a>
         <?php if ($viewerType === 'user'): ?>
           <a class="nav-chip" href="my-recipes.php">وصفاتي</a>
@@ -126,46 +129,49 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
   <div class="container">
 
     <section class="welcome">
-      <h1>وصفة: <span><?php echo htmlspecialchars($recipe['name']); ?></span></h1>
+      <h1>وصفة: <span id="recipeName"><?= htmlspecialchars($recipe['name']) ?></span></h1>
     </section>
 
     <div class="main-grid">
 
-      <!-- Requirement 10b: Recipe details card -->
+      <!-- Recipe details card -->
       <section class="user-info-card">
         <div class="recipe-top">
           <div class="recipe-photo">
-            <img src="images/<?php echo htmlspecialchars($recipe['photoFileName']); ?>"
-                 alt="recipe photo"
+            <img src="images/<?= htmlspecialchars($recipe['photoFileName']) ?>"
+                 alt="صورة الوصفة"
                  class="recipe-photo-img"
                  onerror="this.src='images/default.png'">
           </div>
           <div class="recipe-head-info">
-            <h2 class="recipe-title"><?php echo htmlspecialchars($recipe['name']); ?></h2>
+            <h2 class="recipe-title" id="recipeTitle"><?= htmlspecialchars($recipe['name']) ?></h2>
 
-            <!-- Requirement 10d: Show action buttons only if not creator and not admin -->
+            <!-- Requirement: Show action buttons only for regular users (not admin, not recipe owner) -->
             <?php if ($showButtons): ?>
               <div class="recipe-actions">
 
-                <!-- Favourite button: disabled if already added -->
+                <!-- Requirement: Disable favourite button if user already added recipe to favourites -->
                 <?php if ($alreadyFaved): ?>
                   <button class="filter-button" type="button" disabled>✅ في المفضلة</button>
                 <?php else: ?>
-                  <a href="add_favourite.php?recipe_id=<?php echo $recipeId; ?>" class="filter-button">إضافة للمفضلة ❤️</a>
+                  <!-- Requirement: Clicking favourite sends request to add_favourite.php -->
+                  <a href="add_favourite.php?recipe_id=<?= $recipeId ?>" class="filter-button">إضافة للمفضلة ❤️</a>
                 <?php endif; ?>
 
-                <!-- Like button: disabled if already liked -->
+                <!-- Requirement: Disable like button if user already liked this recipe -->
                 <?php if ($alreadyLiked): ?>
                   <button class="filter-button" type="button" disabled>✅ أعجبك</button>
                 <?php else: ?>
-                  <a href="add_like.php?recipe_id=<?php echo $recipeId; ?>" class="filter-button">إعجاب 👍</a>
+                  <!-- Requirement: Clicking like sends request to add_like.php -->
+                  <a href="add_like.php?recipe_id=<?= $recipeId ?>" class="filter-button">إعجاب 👍</a>
                 <?php endif; ?>
 
-                <!-- Report button: disabled if already reported and still pending -->
+                <!-- Requirement: Disable report button if user already reported this recipe -->
                 <?php if ($alreadyReported): ?>
                   <button class="filter-button" type="button" disabled>⏳ تم الإبلاغ</button>
                 <?php else: ?>
-                  <a href="add_report.php?recipe_id=<?php echo $recipeId; ?>"
+                  <!-- Requirement: Clicking report sends request to add_report.php -->
+                  <a href="add_report.php?recipe_id=<?= $recipeId ?>"
                      class="filter-button"
                      onclick="return confirm('هل تريد الإبلاغ عن هذه الوصفة؟');">إبلاغ 🚩</a>
                 <?php endif; ?>
@@ -175,6 +181,7 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
           </div>
         </div>
 
+        <!-- Creator, category and description info -->
         <div class="info-grid">
           <div class="info-item">
             <div class="info-icon">👩‍🍳</div>
@@ -182,11 +189,11 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
               <div class="info-label">صاحب الوصفة</div>
               <div class="info-value">
                 <div class="creator-info">
-                  <img src="images/<?php echo htmlspecialchars($recipe['creatorPhoto'] ?: 'default.png'); ?>"
+                  <img src="images/<?= htmlspecialchars($recipe['creatorPhoto'] ?: 'default.png') ?>"
                        class="creator-photo" alt="creator"
                        onerror="this.src='images/default.png'">
                   <span class="creator-name">
-                    <?php echo htmlspecialchars($recipe['firstName'] . ' ' . $recipe['lastName']); ?>
+                    <?= htmlspecialchars($recipe['firstName'] . ' ' . $recipe['lastName']) ?>
                   </span>
                 </div>
               </div>
@@ -198,7 +205,7 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
             <div class="info-content">
               <div class="info-label">الفئة</div>
               <div class="info-value">
-                <span class="category-badge"><?php echo htmlspecialchars($recipe['categoryName']); ?></span>
+                <span class="category-badge"><?= htmlspecialchars($recipe['categoryName']) ?></span>
               </div>
             </div>
           </div>
@@ -207,7 +214,9 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
             <div class="info-icon">📝</div>
             <div class="info-content">
               <div class="info-label">الوصف</div>
-              <div class="info-value"><?php echo htmlspecialchars($recipe['description']); ?></div>
+              <div class="info-value" id="recipeDesc">
+                <?= htmlspecialchars($recipe['description']) ?>
+              </div>
             </div>
           </div>
         </div>
@@ -218,15 +227,15 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
         <h3>معلومات سريعة</h3>
         <div class="stats-boxes">
           <div class="stat-box">
-            <div class="stat-number"><?php echo $totalLikes; ?></div>
+            <div class="stat-number"><?= $totalLikes ?></div>
             <div class="stat-label">عدد الإعجابات</div>
           </div>
           <div class="stat-box">
-            <div class="stat-number"><?php echo $totalFavs; ?></div>
+            <div class="stat-number"><?= $totalFavs ?></div>
             <div class="stat-label">عدد المفضلة</div>
           </div>
           <div class="stat-box">
-            <div class="stat-number"><?php echo count($comments); ?></div>
+            <div class="stat-number"><?= count($comments) ?></div>
             <div class="stat-label">عدد التعليقات</div>
           </div>
         </div>
@@ -245,15 +254,24 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
           <tbody>
             <?php foreach ($ingredients as $ing): ?>
               <tr>
-                <td><?php echo htmlspecialchars($ing['ingredientName']); ?></td>
-                <td><?php echo htmlspecialchars($ing['ingredientQuantity']); ?></td>
+                <td><?= htmlspecialchars($ing['ingredientName']) ?></td>
+                <td><?= htmlspecialchars($ing['ingredientQuantity']) ?></td>
               </tr>
             <?php endforeach; ?>
           </tbody>
         </table>
       <?php else: ?>
-        <p>No ingredients listed.</p>
+        <p>لا توجد مكونات مضافة.</p>
       <?php endif; ?>
+
+      <!-- Healthy alternatives box (shown if recipe has alternatives stored) -->
+      <div class="healthy-box">
+        <div class="healthy-num">🌿</div>
+        <div class="healthy-content">
+          <div class="healthy-title">بدائل صحية (اختياري) 🌿</div>
+          <div class="healthy-text">يمكن استبدال بعض المكونات ببدائل أكثر صحية حسب الرغبة.</div>
+        </div>
+      </div>
     </section>
 
     <!-- Instructions -->
@@ -263,37 +281,40 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
         <div class="recipe-steps">
           <?php foreach ($instructions as $inst): ?>
             <div class="step-item">
-              <div class="step-num"><?php echo (int)$inst['stepOrder']; ?></div>
-              <div class="step-text"><?php echo htmlspecialchars($inst['step']); ?></div>
+              <div class="step-num"><?= (int)$inst['stepOrder'] ?></div>
+              <div class="step-text"><?= htmlspecialchars($inst['step']) ?></div>
             </div>
           <?php endforeach; ?>
         </div>
       <?php else: ?>
-        <p>No steps listed.</p>
+        <p>لا توجد خطوات مضافة.</p>
       <?php endif; ?>
     </section>
 
-    <!-- Video -->
+    <!-- Video section -->
     <?php if (!empty($recipe['videoFilePath'])): ?>
       <section class="all-recipes-section">
         <h2 class="section-title">الفيديو</h2>
-        <div class="filter-bar">
-          <a class="recipe-name-link"
-             href="videos/<?php echo htmlspecialchars($recipe['videoFilePath']); ?>"
-             target="_blank">
-            اضغط هنا لمشاهدة الفيديو
-          </a>
+        <div class="filter-bar" style="justify-content: space-between;">
+          <div style="font-weight:600; color:#B56A63;">
+            رابط الفيديو:
+            <a class="recipe-name-link"
+               href="videos/<?= htmlspecialchars($recipe['videoFilePath']) ?>"
+               target="_blank" rel="noopener">
+              اضغط هنا لمشاهدة الفيديو
+            </a>
+          </div>
         </div>
       </section>
     <?php endif; ?>
 
-    <!-- Requirement 10c: Comments section with add-comment form -->
+    <!-- Requirement: Comment form - recipe ID included as hidden input -->
     <section class="favorites-section">
       <h2 class="section-title">التعليقات</h2>
 
-      <!-- Comment form - hidden recipe ID (Req 10c) -->
+      <!-- Requirement: Form submits to add_comment.php which adds comment to DB and redirects here -->
       <form action="add_comment.php" method="POST" class="comment-box">
-        <input type="hidden" name="recipe_id" value="<?php echo $recipeId; ?>">
+        <input type="hidden" name="recipe_id" value="<?= $recipeId ?>">
         <input type="text" name="comment" class="comment-input" placeholder="اكتب تعليقك هنا..." required />
         <button class="filter-button" type="submit">إضافة تعليق</button>
       </form>
@@ -304,19 +325,19 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
           <?php foreach ($comments as $c): ?>
             <div class="comment-item">
               <div class="creator-info">
-                <img src="images/<?php echo htmlspecialchars($c['commenterPhoto'] ?: 'default.png'); ?>"
+                <img src="images/<?= htmlspecialchars($c['commenterPhoto'] ?: 'default.png') ?>"
                      class="creator-photo" alt="commenter"
                      onerror="this.src='images/default.png'">
                 <span class="creator-name">
-                  <?php echo htmlspecialchars($c['firstName'] . ' ' . $c['lastName']); ?>
+                  <?= htmlspecialchars($c['firstName'] . ' ' . $c['lastName']) ?>
                 </span>
-                <div class="comment-date"><?php echo htmlspecialchars($c['date']); ?></div>
+                <div class="comment-date"><?= htmlspecialchars($c['date']) ?></div>
               </div>
-              <p class="comment-text"><?php echo htmlspecialchars($c['comment']); ?></p>
+              <p class="comment-text"><?= htmlspecialchars($c['comment']) ?></p>
             </div>
           <?php endforeach; ?>
         <?php else: ?>
-          <p style="color:#666;">No comments yet. Be the first to comment!</p>
+          <p style="color:#666;">لا توجد تعليقات بعد. كن أول من يعلّق!</p>
         <?php endif; ?>
       </div>
     </section>
@@ -325,6 +346,7 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
 
   <footer class="site-footer" role="contentinfo">
     <div class="container footer-inner">
+
       <div class="footer-col footer-about">
         <div class="footer-brand">
           <img src="images/logo.png" alt="شعار سُفرة" class="footer-logo">
@@ -332,6 +354,7 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
         </div>
         <p class="footer-text">منصة وصفات رمضانية تساعدك توصل لوصفات الإفطار والسحور بطريقة مرتبة وبسيطة.</p>
       </div>
+
       <div class="footer-col">
         <h4 class="footer-heading">استكشاف</h4>
         <ul class="footer-links">
@@ -342,6 +365,16 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
           <?php endif; ?>
         </ul>
       </div>
+
+      <div class="footer-col">
+        <h4 class="footer-heading">التصنيفات</h4>
+        <ul class="footer-links">
+          <li><a href="user.php">إفطار</a></li>
+          <li><a href="user.php">سحور</a></li>
+          <li><a href="user.php">حلويات</a></li>
+        </ul>
+      </div>
+
       <div class="footer-col">
         <h4 class="footer-heading">تواصل معنا</h4>
         <div class="footer-social">
@@ -352,7 +385,9 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
         </div>
         <p class="footer-mini">البريد: <a href="mailto:sufrah@example.com">sufrah@example.com</a></p>
       </div>
+
     </div>
+
     <div class="footer-bottom">
       <div class="container footer-bottom-inner">
         <small>© 2026 سُفرة .</small>

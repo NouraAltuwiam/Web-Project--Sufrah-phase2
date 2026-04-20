@@ -1,6 +1,6 @@
 <?php
 // signout.php
-// Requirement 12: Wipe the session and redirect to the homepage
+// Requirement: Wipe out all session variables and redirect to homepage.
 
 session_start();
 session_unset();

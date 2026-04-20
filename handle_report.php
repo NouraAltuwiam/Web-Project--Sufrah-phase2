@@ -1,7 +1,8 @@
 <?php
 // handle_report.php
-// Handles admin report actions: block user or dismiss report
-// Requirement 11c: Separate PHP page for processing report actions
+// Requirement: Handles admin report actions.
+//              If action is block: delete all user's recipes and associated data, add user to blocked table, delete from users table.
+//              Always deletes the report. Redirects to admin page.
 
 session_start();
 require_once 'dp.php';
@@ -24,7 +25,7 @@ $reportID = (int) $_POST['reportID'];
 $recipeID = (int) $_POST['recipeID'];
 $ownerID  = (int) $_POST['ownerID'];
 
-// Requirement 11c: If action is block, delete user data and add to blocked table
+// Requirement: If action is block - delete all user data and add to blocked users table
 if ($action === 'block') {
 
     // Get user info before deleting
@@ -34,7 +35,7 @@ if ($action === 'block') {
 
     if ($userData) {
 
-        // Get all recipes by this user to delete their files
+        // Get all recipes by this user so we can delete their files
         $stmtRecipes = $pdo->prepare("SELECT id, photoFileName, videoFilePath FROM recipe WHERE userID = ?");
         $stmtRecipes->execute([$ownerID]);
         $recipes = $stmtRecipes->fetchAll();
@@ -42,23 +43,19 @@ if ($action === 'block') {
         foreach ($recipes as $rec) {
             $rID = (int) $rec['id'];
 
-            // Delete recipe photo file from server
+            // Delete recipe photo file
             if (!empty($rec['photoFileName'])) {
-                $photoPath = "images/" . $rec['photoFileName'];
-                if (file_exists($photoPath)) {
-                    unlink($photoPath);
-                }
+                $p = "images/" . $rec['photoFileName'];
+                if (file_exists($p)) unlink($p);
             }
 
-            // Delete recipe video file from server
+            // Delete recipe video file
             if (!empty($rec['videoFilePath'])) {
-                $videoPath = "videos/" . $rec['videoFilePath'];
-                if (file_exists($videoPath)) {
-                    unlink($videoPath);
-                }
+                $v = "videos/" . $rec['videoFilePath'];
+                if (file_exists($v)) unlink($v);
             }
 
-            // Delete all data related to this recipe (order matters due to foreign keys)
+            // Requirement: Delete all data associated with this recipe
             $pdo->prepare("DELETE FROM comment      WHERE recipeID = ?")->execute([$rID]);
             $pdo->prepare("DELETE FROM likes        WHERE recipeID = ?")->execute([$rID]);
             $pdo->prepare("DELETE FROM favourites   WHERE recipeID = ?")->execute([$rID]);
@@ -67,36 +64,32 @@ if ($action === 'block') {
             $pdo->prepare("DELETE FROM instructions WHERE recipeID = ?")->execute([$rID]);
         }
 
-        // Delete all recipes by this user
-        $pdo->prepare("DELETE FROM recipe WHERE userID = ?")->execute([$ownerID]);
-// Delete all recipes by this user
+        // Requirement: Delete all of the user's recipes
         $pdo->prepare("DELETE FROM recipe WHERE userID = ?")->execute([$ownerID]);
 
-        // ← أضيفي هنا: حذف بيانات المستخدم على وصفات الآخرين
+        // Delete remaining user activity records
         $pdo->prepare("DELETE FROM comment    WHERE userID = ?")->execute([$ownerID]);
         $pdo->prepare("DELETE FROM likes      WHERE userID = ?")->execute([$ownerID]);
         $pdo->prepare("DELETE FROM favourites WHERE userID = ?")->execute([$ownerID]);
         $pdo->prepare("DELETE FROM report     WHERE userID = ?")->execute([$ownerID]);
 
-        // Add user to the blocked users table
-        $stmtBlock = $pdo->prepare("INSERT INTO blockeduser (firstName, lastName, emailAddress) VALUES (?, ?, ?)");
-        // Add user to the blocked users table
-        $stmtBlock = $pdo->prepare("INSERT INTO blockeduser (firstName, lastName, emailAddress) VALUES (?, ?, ?)");
-        $stmtBlock->execute([$userData['firstName'], $userData['lastName'], $userData['emailAddress']]);
+        // Requirement: Add user to the blocked users table
+        $pdo->prepare("INSERT INTO blockeduser (firstName, lastName, emailAddress) VALUES (?, ?, ?)")
+            ->execute([$userData['firstName'], $userData['lastName'], $userData['emailAddress']]);
 
-        // Delete user from the users table
+        // Requirement: Delete the user from the users table
         $pdo->prepare("DELETE FROM user WHERE id = ?")->execute([$ownerID]);
     }
 }
 
-// Always delete the report whether we blocked or dismissed
-// (reportID may have already been deleted by the cascade above if action was block)
+// Requirement: Always delete the report (whether action was block or dismiss)
 try {
     $pdo->prepare("DELETE FROM report WHERE id = ?")->execute([$reportID]);
 } catch (Exception $e) {
-    // Report was already deleted by cascade delete above
+    // Report may already be deleted by cascade above - safe to ignore
 }
 
+// Requirement: Redirect to admin page
 header("Location: admin.php");
 exit();
 ?>

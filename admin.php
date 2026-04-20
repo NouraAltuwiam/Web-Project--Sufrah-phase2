@@ -1,37 +1,34 @@
 <?php
 // admin.php
-// Admin dashboard page - shows reports and blocked users
-// Requirement 11: Admin page with full DB integration
+// Requirement: Admin dashboard - shows welcome info, reports table, and blocked users table.
 
 session_start();
 require_once 'dp.php';
 
-// Requirement 11a: Check that the logged-in user is an admin
+// Requirement: Check that the logged-in user is an admin - redirect if not
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'admin') {
     header("Location: login.php?error=" . urlencode("يجب تسجيل الدخول كمسؤول للوصول لهذه الصفحة"));
     exit();
 }
 
-// Requirement 11b: Retrieve admin info from the database using session ID
-$adminID = (int) $_SESSION['user_id'];
-
-$stmtAdmin = $pdo->prepare("SELECT firstName, lastName, emailAddress FROM user WHERE id = ? AND userType = 'admin'");
+// Requirement: Retrieve admin info from the database using session ID
+$adminID    = (int) $_SESSION['user_id'];
+$stmtAdmin  = $pdo->prepare("SELECT firstName, lastName, emailAddress FROM user WHERE id = ? AND userType = 'admin'");
 $stmtAdmin->execute([$adminID]);
 $admin = $stmtAdmin->fetch();
 
-// If admin record not found redirect to login
 if (!$admin) {
     session_destroy();
     header("Location: login.php?error=" . urlencode("لم يتم العثور على حساب المسؤول"));
     exit();
 }
 
-// System statistics for the stats boxes
+// System stats for the stats boxes
 $totalUsers   = $pdo->query("SELECT COUNT(*) FROM user WHERE userType = 'user'")->fetchColumn();
 $totalRecipes = $pdo->query("SELECT COUNT(*) FROM recipe")->fetchColumn();
 $totalReports = $pdo->query("SELECT COUNT(*) FROM report")->fetchColumn();
 
-// Requirement 11c: Retrieve all pending reports with recipe and owner info
+// Requirement: Retrieve all reports from the database with recipe and owner info
 $stmtReports = $pdo->query("
     SELECT
         report.id            AS reportID,
@@ -49,7 +46,7 @@ $stmtReports = $pdo->query("
 ");
 $reports = $stmtReports->fetchAll();
 
-// Requirement 11d: Retrieve all blocked users
+// Requirement: Retrieve all blocked users from the database
 $stmtBlocked = $pdo->query("SELECT id, firstName, lastName, emailAddress FROM blockeduser ORDER BY id DESC");
 $blockedUsers = $stmtBlocked->fetchAll();
 ?>
@@ -63,34 +60,31 @@ $blockedUsers = $stmtBlocked->fetchAll();
 </head>
 <body>
 
+  <!-- Header -->
   <header class="site-header">
     <div class="container header-inner">
-
       <div id="logo">
         <img src="images/logo.png" alt="Logo">
         <span>سُفــــرة</span>
       </div>
-
       <nav class="nav">
         <a class="nav-chip is-active" href="admin.php">لوحة الإدارة</a>
       </nav>
-
-      <!-- Requirement 12: Sign-out link that goes to signout.php -->
+      <!-- Requirement: Sign-out clears session and redirects to homepage -->
       <a href="signout.php" class="sign-out">تسجيل الخروج</a>
-
     </div>
   </header>
 
   <div class="container">
 
-    <!-- Welcome message with admin name from database -->
+    <!-- Requirement: Display welcome note with admin's name from database -->
     <section class="welcome">
       <h1>مرحبا <span><?= htmlspecialchars($admin['firstName']) ?></span> !</h1>
     </section>
 
     <div class="main-grid">
 
-      <!-- Admin info card showing data from database -->
+      <!-- Requirement: Display admin info retrieved from database -->
       <section class="user-info-card">
         <div class="user-header">
           <div class="user-photo">
@@ -121,7 +115,7 @@ $blockedUsers = $stmtBlocked->fetchAll();
         </div>
       </section>
 
-      <!-- System statistics retrieved from database -->
+      <!-- System statistics -->
       <section class="my-recipes-card">
         <h3>إحصائيات النظام</h3>
         <div class="stats-boxes">
@@ -142,7 +136,7 @@ $blockedUsers = $stmtBlocked->fetchAll();
 
     </div>
 
-    <!-- Requirement 11c: Pending reports table -->
+    <!-- Requirement: Reports table - all reports retrieved from database -->
     <section class="all-recipes-section">
       <h2 class="section-title">البلاغات المعلقة</h2>
 
@@ -160,32 +154,31 @@ $blockedUsers = $stmtBlocked->fetchAll();
             <?php foreach ($reports as $report): ?>
             <tr>
               <td>
-                <!-- Recipe name is a generated link to view-recipe page (Requirement 11c) -->
+                <!-- Requirement: Recipe name is a generated link to view-recipe page -->
                 <a href="view-recipe.php?id=<?= (int)$report['recipeID'] ?>" class="recipe-name-link">
                   <?= htmlspecialchars($report['recipeName']) ?>
                 </a>
               </td>
               <td>
-                <img
-                  src="images/<?= htmlspecialchars($report['recipePhoto']) ?>"
-                  class="recipe-image thumb-img"
-                  alt="<?= htmlspecialchars($report['recipeName']) ?>"
-                  onerror="this.src='images/default.png'">
+                <img src="images/<?= htmlspecialchars($report['recipePhoto']) ?>"
+                     class="thumb-img"
+                     alt="<?= htmlspecialchars($report['recipeName']) ?>"
+                     onerror="this.src='images/default.png'">
               </td>
               <td>
                 <div class="creator-info">
-                  <img
-                    src="images/<?= htmlspecialchars($report['ownerPhoto'] ?: 'default.png') ?>"
-                    class="creator-photo"
-                    alt="<?= htmlspecialchars($report['ownerFirst']) ?>"
-                    onerror="this.src='images/default.png'">
+                  <img src="images/<?= htmlspecialchars($report['ownerPhoto'] ?: 'default.png') ?>"
+                       class="creator-photo"
+                       alt="<?= htmlspecialchars($report['ownerFirst']) ?>"
+                       onerror="this.src='images/default.png'">
                   <span class="creator-name">
                     <?= htmlspecialchars($report['ownerFirst'] . ' ' . $report['ownerLast']) ?>
                   </span>
                 </div>
               </td>
               <td>
-                <!-- Requirement 11c: Action form sends to handle_report.php with recipe ID hidden -->
+                <!-- Requirement: Action form includes recipe ID as hidden input, submits to handle_report.php -->
+                <!-- Requirement: Actions are block user or dismiss report -->
                 <form action="handle_report.php" method="POST">
                   <input type="hidden" name="reportID" value="<?= (int)$report['reportID'] ?>">
                   <input type="hidden" name="recipeID" value="<?= (int)$report['recipeID'] ?>">
@@ -205,7 +198,7 @@ $blockedUsers = $stmtBlocked->fetchAll();
       <?php endif; ?>
     </section>
 
-    <!-- Requirement 11d: Blocked users table -->
+    <!-- Requirement: Blocked users table - all blocked users retrieved from database -->
     <section class="favorites-section">
       <h2 class="section-title">المستخدمون المحظورون</h2>
 
@@ -223,7 +216,6 @@ $blockedUsers = $stmtBlocked->fetchAll();
             <tr>
               <td>
                 <div class="creator-info">
-                  <!-- Blocked users have no photo so we use a default -->
                   <img src="images/default.png" class="creator-photo"
                        alt="<?= htmlspecialchars($blocked['firstName']) ?>"
                        onerror="this.src='images/default.png'">
@@ -234,7 +226,6 @@ $blockedUsers = $stmtBlocked->fetchAll();
               </td>
               <td><?= htmlspecialchars($blocked['emailAddress']) ?></td>
               <td>
-                <!-- Unblock link goes to unblock_user.php with the blocked user ID -->
                 <a href="unblock_user.php?id=<?= (int)$blocked['id'] ?>" class="unblock-btn">إلغاء الحظر</a>
               </td>
             </tr>
@@ -242,7 +233,7 @@ $blockedUsers = $stmtBlocked->fetchAll();
           </tbody>
         </table>
       <?php else: ?>
-        <p style="color:#fff; padding:16px 0;">لا يوجد مستخدمون محظورون حالياً</p>
+        <p style="padding:16px 0;">لا يوجد مستخدمون محظورون حالياً</p>
       <?php endif; ?>
     </section>
 
@@ -250,6 +241,7 @@ $blockedUsers = $stmtBlocked->fetchAll();
 
   <footer class="site-footer" role="contentinfo">
     <div class="container footer-inner">
+
       <div class="footer-col footer-about">
         <div class="footer-brand">
           <img src="images/logo.png" alt="شعار سُفرة" class="footer-logo">
@@ -257,6 +249,7 @@ $blockedUsers = $stmtBlocked->fetchAll();
         </div>
         <p class="footer-text">منصة وصفات رمضانية تساعدك توصل لوصفات الإفطار والسحور بطريقة مرتبة وبسيطة.</p>
       </div>
+
       <div class="footer-col">
         <h4 class="footer-heading">استكشاف</h4>
         <ul class="footer-links">
@@ -264,6 +257,16 @@ $blockedUsers = $stmtBlocked->fetchAll();
           <li><a href="admin.php">لوحة الإدارة</a></li>
         </ul>
       </div>
+
+      <div class="footer-col">
+        <h4 class="footer-heading">التصنيفات</h4>
+        <ul class="footer-links">
+          <li><a href="admin.php">إفطار</a></li>
+          <li><a href="admin.php">سحور</a></li>
+          <li><a href="admin.php">حلويات</a></li>
+        </ul>
+      </div>
+
       <div class="footer-col">
         <h4 class="footer-heading">تواصل معنا</h4>
         <div class="footer-social">
@@ -274,7 +277,9 @@ $blockedUsers = $stmtBlocked->fetchAll();
         </div>
         <p class="footer-mini">البريد: <a href="mailto:sufrah@example.com">sufrah@example.com</a></p>
       </div>
+
     </div>
+
     <div class="footer-bottom">
       <div class="container footer-bottom-inner">
         <small>© 2026 سُفرة .</small>

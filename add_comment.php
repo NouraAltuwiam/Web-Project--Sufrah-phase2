@@ -1,11 +1,12 @@
 <?php
 // add_comment.php
-// Requirement 10c: Adds a comment for a recipe and redirects back to view-recipe.php
+// Requirement: Adds a new comment for a recipe in the database,
+//              then redirects back to view-recipe.php for the same recipe.
 
 session_start();
 require 'dp.php';
 
-// Requirement 5: Must be logged in
+// Requirement: Must be logged in to comment
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php?error=" . urlencode("You must be logged in to comment."));
     exit();
@@ -33,11 +34,11 @@ if (!$stmtCheck->fetch()) {
     exit();
 }
 
-// Insert the comment with today's date
+// Requirement: Insert the new comment into the database
 $stmt = $pdo->prepare("INSERT INTO comment (recipeID, userID, comment, date) VALUES (?, ?, ?, CURDATE())");
 $stmt->execute([$recipeId, $userId, $comment]);
 
-// Requirement 10c: Redirect back to view-recipe page for the same recipe
+// Requirement: Redirect back to view-recipe page for this recipe
 header("Location: view-recipe.php?id={$recipeId}");
 exit();
 ?>

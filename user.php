@@ -1,23 +1,28 @@
 <?php
+// user.php
+// Requirement: User page - checks session, retrieves user info, shows stats,
+//              filters recipes by category, and displays favourites.
+
 session_start();
 require_once 'dp.php';
 
+// Requirement: Check that the logged-in user is a regular user - redirect if not
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'user') {
-    header("Location: login.php?msg=" . urlencode("You must login as a regular user"));
+    header("Location: login.php?error=" . urlencode("You must login as a regular user"));
     exit();
 }
 
 $user_id = (int) $_SESSION['user_id'];
 
-/* 1) Retrieve user info */
-$stmt_user = $pdo->prepare("SELECT id, firstName, lastName, emailAddress, photoFileName 
-                             FROM user 
+// Requirement: Retrieve user info using session user ID
+$stmt_user = $pdo->prepare("SELECT id, firstName, lastName, emailAddress, photoFileName
+                             FROM user
                              WHERE id = ? AND userType = 'user'");
 $stmt_user->execute([$user_id]);
 $user = $stmt_user->fetch();
 
 if (!$user) {
-    header("Location: login.php?msg=" . urlencode("User not found"));
+    header("Location: login.php?error=" . urlencode("User not found"));
     exit();
 }
 
@@ -25,49 +30,47 @@ $full_name  = trim($user['firstName'] . " " . $user['lastName']);
 $photo_file = !empty($user['photoFileName']) ? $user['photoFileName'] : "default.png";
 $photo_path = "images/" . $photo_file;
 
-/* 2) Total recipes for this user */
-$stmt_total_recipes = $pdo->prepare("SELECT COUNT(*) AS total_recipes FROM recipe WHERE userID = ?");
+// Requirement: Retrieve total number of recipes for this user
+$stmt_total_recipes = $pdo->prepare("SELECT COUNT(*) FROM recipe WHERE userID = ?");
 $stmt_total_recipes->execute([$user_id]);
 $total_recipes = (int) $stmt_total_recipes->fetchColumn();
 
-/* 3) Total likes for all user's recipes */
-$stmt_total_likes = $pdo->prepare("SELECT COUNT(l.recipeID) AS total_likes
+// Requirement: Retrieve total number of likes across all user's recipes
+$stmt_total_likes = $pdo->prepare("SELECT COUNT(l.recipeID)
                                    FROM recipe r
                                    LEFT JOIN likes l ON r.id = l.recipeID
                                    WHERE r.userID = ?");
 $stmt_total_likes->execute([$user_id]);
 $total_likes = (int) $stmt_total_likes->fetchColumn();
 
-/* 4) Retrieve categories for the filter form */
+// Requirement: Retrieve categories from database for the filter form
 $stmt_categories = $pdo->query("SELECT id, categoryName FROM recipecategory ORDER BY categoryName");
 $categories = $stmt_categories->fetchAll();
 
-/* 5) Recipes list (GET = all, POST = filtered by category) */
+// Requirement: If GET request - retrieve all recipes; if POST - filter by selected category
 $selected_category_id = "";
-$recipes = [];
-$no_recipes_message = "";
+$recipes              = [];
+$no_recipes_message   = "";
 
 $base_sql = "SELECT r.id, r.name, r.photoFileName,
                     u.firstName, u.lastName, u.photoFileName AS userPhoto,
                     c.categoryName, COUNT(l.recipeID) AS totalLikes
              FROM recipe r
-             LEFT JOIN user u ON r.userID = u.id
-             LEFT JOIN recipecategory c ON r.categoryID = c.id
-             LEFT JOIN likes l ON r.id = l.recipeID";
+             LEFT JOIN user u            ON r.userID    = u.id
+             LEFT JOIN recipecategory c  ON r.categoryID = c.id
+             LEFT JOIN likes l           ON r.id         = l.recipeID";
 
 $group_sql = " GROUP BY r.id, r.name, r.photoFileName,
-                         u.firstName, u.lastName, u.photoFileName,
-                         c.categoryName
+                         u.firstName, u.lastName, u.photoFileName, c.categoryName
                ORDER BY r.id DESC";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_id']) && $_POST['category_id'] !== '') {
+    // Requirement: POST - retrieve only recipes in the selected category
     $selected_category_id = (int) $_POST['category_id'];
     $stmt_recipes = $pdo->prepare($base_sql . " WHERE r.categoryID = ?" . $group_sql);
     $stmt_recipes->execute([$selected_category_id]);
 } else {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_id'])) {
-        $selected_category_id = "";
-    }
+    // Requirement: GET - retrieve all recipes in the database
     $stmt_recipes = $pdo->prepare($base_sql . $group_sql);
     $stmt_recipes->execute();
 }
@@ -78,7 +81,7 @@ if (empty($recipes)) {
     $no_recipes_message = "لا توجد وصفات في هذه الفئة.";
 }
 
-/* 6) Retrieve favourite recipes of this user */
+// Requirement: Retrieve user's favourite recipes from the database
 $stmt_favourites = $pdo->prepare("SELECT r.id, r.name, r.photoFileName
                                    FROM favourites f
                                    INNER JOIN recipe r ON f.recipeID = r.id
@@ -93,41 +96,43 @@ $favourites = $stmt_favourites->fetchAll();
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>سفرة</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="style.css">
   <style>
     .fav-item:hover { color: #8FAE9E; text-decoration: underline; }
-    .filter-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 16px 0 20px; }
+    .filter-bar  { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 16px 0 20px; }
     .filter-form { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; width: 100%; }
-    .remove-link { display: inline-block; text-decoration: none; color: inherit; width: 100%; height: 100%; }
-    .block-btn { cursor: pointer; }
   </style>
 </head>
 <body>
 
+  <!-- Header -->
   <header class="site-header">
     <div class="container header-inner">
       <div id="logo">
         <img src="images/logo.png" alt="Logo">
         <span>سُفــــرة</span>
       </div>
+      <!-- Requirement: Security - sign-out clears session -->
       <a href="signout.php" class="sign-out">تسجيل الخروج</a>
     </div>
   </header>
 
   <div class="container">
 
+    <!-- Requirement: Display welcome note with user's name from database -->
     <section class="welcome">
       <h1>مرحبًا <span><?= htmlspecialchars($user['firstName']) ?></span> !</h1>
     </section>
 
     <div class="main-grid">
 
+      <!-- Requirement: Display user info and photo retrieved from database -->
       <section class="user-info-card">
         <div class="user-header">
           <div class="user-photo">
-            <img src="<?= htmlspecialchars($photo_path) ?>" alt="User Avatar" style="width:100%;height:100%;object-fit:cover;">
+            <img src="<?= htmlspecialchars($photo_path) ?>" alt="User Avatar"
+                 style="width:100%;height:100%;object-fit:cover;"
+                 onerror="this.src='images/default.png'">
           </div>
           <div class="user-title">
             <h2><?= htmlspecialchars($full_name) ?></h2>
@@ -152,6 +157,7 @@ $favourites = $stmt_favourites->fetchAll();
         </div>
       </section>
 
+      <!-- Requirement: My recipes area with link to my-recipes page, total recipes, total likes -->
       <section class="my-recipes-card">
         <h3>وصفاتي</h3>
         <a href="my-recipes.php" class="recipes-link">
@@ -159,10 +165,12 @@ $favourites = $stmt_favourites->fetchAll();
           <img src="images/arrow.svg" class="icon-sm" alt="سهم">
         </a>
         <div class="stats-boxes">
+          <!-- Requirement: Display total recipe count from database -->
           <div class="stat-box">
             <div class="stat-number"><?= $total_recipes ?></div>
             <div class="stat-label">إجمالي الوصفات</div>
           </div>
+          <!-- Requirement: Display total likes count from database -->
           <div class="stat-box">
             <div class="stat-number">
               <img src="images/heart.svg" class="heart-icon" alt="قلب">
@@ -175,14 +183,17 @@ $favourites = $stmt_favourites->fetchAll();
 
     </div>
 
-    <!-- All Recipes -->
+    <!-- Requirement: All recipes table with category filter form -->
     <section class="all-recipes-section">
       <h2 class="section-title">جميع الوصفات المتاحة</h2>
 
       <div class="filter-bar">
+        <!-- Requirement: Filter form - POST to same page with selected category -->
         <form method="POST" action="user.php" class="filter-form">
           <img src="images/filter.svg" class="icon-sm" alt="تصفية">
           <label for="categoryFilter" class="filter-label">تصفية حسب الفئة:</label>
+
+          <!-- Requirement: Categories loaded from database -->
           <select name="category_id" id="categoryFilter" class="category-select">
             <option value="">جميع الفئات</option>
             <?php foreach ($categories as $cat): ?>
@@ -192,6 +203,7 @@ $favourites = $stmt_favourites->fetchAll();
               </option>
             <?php endforeach; ?>
           </select>
+
           <button class="filter-button" type="submit">تصفية</button>
         </form>
       </div>
@@ -213,6 +225,7 @@ $favourites = $stmt_favourites->fetchAll();
             <?php foreach ($recipes as $recipe): ?>
               <tr>
                 <td>
+                  <!-- Requirement: Recipe name is a generated link to view-recipe page -->
                   <a href="view-recipe.php?id=<?= (int)$recipe['id'] ?>" class="recipe-name-link">
                     <?= htmlspecialchars($recipe['name']) ?>
                   </a>
@@ -225,7 +238,7 @@ $favourites = $stmt_favourites->fetchAll();
                 </td>
                 <td>
                   <div class="creator-info">
-                    <img src="images/<?= htmlspecialchars(!empty($recipe['userPhoto']) ? $recipe['userPhoto'] : 'default.png') ?>"
+                    <img src="images/<?= htmlspecialchars($recipe['userPhoto'] ?: 'default.png') ?>"
                          class="creator-photo"
                          alt="<?= htmlspecialchars($recipe['firstName']) ?>"
                          onerror="this.src='images/default.png'">
@@ -234,6 +247,7 @@ $favourites = $stmt_favourites->fetchAll();
                     </span>
                   </div>
                 </td>
+                <!-- Requirement: Count and display likes from database -->
                 <td>
                   <span class="likes-count">
                     <img src="images/heart.svg" class="likes-heart" alt="إعجاب">
@@ -250,7 +264,7 @@ $favourites = $stmt_favourites->fetchAll();
       <?php endif; ?>
     </section>
 
-    <!-- Favourites -->
+    <!-- Requirement: Favourites table with remove link for each recipe -->
     <section class="favorites-section">
       <h2 class="section-title">
         <img src="images/heart.svg" class="heart-title" alt="قلب">
@@ -270,6 +284,7 @@ $favourites = $stmt_favourites->fetchAll();
             <?php foreach ($favourites as $fav): ?>
               <tr>
                 <td>
+                  <!-- Requirement: Favourite recipe name is a link to view-recipe page -->
                   <a href="view-recipe.php?id=<?= (int)$fav['id'] ?>" class="fav-name">
                     <?= htmlspecialchars($fav['name']) ?>
                   </a>
@@ -281,6 +296,7 @@ $favourites = $stmt_favourites->fetchAll();
                        onerror="this.src='images/default.png'">
                 </td>
                 <td>
+                  <!-- Requirement: Remove link deletes recipe from favourites and redirects to user page -->
                   <a href="remove-favourite.php?recipe_id=<?= (int)$fav['id'] ?>"
                      onclick="return confirm('هل تريد حذف هذه الوصفة من المفضلة؟');">
                     <button class="block-btn" type="button">حذف</button>
@@ -299,6 +315,7 @@ $favourites = $stmt_favourites->fetchAll();
 
   <footer class="site-footer" role="contentinfo">
     <div class="container footer-inner">
+
       <div class="footer-col footer-about">
         <div class="footer-brand">
           <img src="images/logo.png" alt="شعار سُفرة" class="footer-logo">
@@ -306,6 +323,7 @@ $favourites = $stmt_favourites->fetchAll();
         </div>
         <p class="footer-text">منصة وصفات رمضانية تساعدك توصل لوصفات الإفطار والسحور بطريقة مرتبة وبسيطة.</p>
       </div>
+
       <div class="footer-col">
         <h4 class="footer-heading">استكشاف</h4>
         <ul class="footer-links">
@@ -314,14 +332,16 @@ $favourites = $stmt_favourites->fetchAll();
           <li><a href="add-recipe.php">إضافة وصفة</a></li>
         </ul>
       </div>
+
       <div class="footer-col">
         <h4 class="footer-heading">التصنيفات</h4>
         <ul class="footer-links">
-          <li><a href="user.php">إفطار</a></li>
-          <li><a href="user.php">سحور</a></li>
-          <li><a href="user.php">حلويات</a></li>
+          <li><a href="my-recipes.php">إفطار</a></li>
+          <li><a href="my-recipes.php">سحور</a></li>
+          <li><a href="my-recipes.php">حلويات</a></li>
         </ul>
       </div>
+
       <div class="footer-col">
         <h4 class="footer-heading">تواصل معنا</h4>
         <div class="footer-social">
@@ -332,11 +352,13 @@ $favourites = $stmt_favourites->fetchAll();
         </div>
         <p class="footer-mini">البريد: <a href="mailto:sufrah@example.com">sufrah@example.com</a></p>
       </div>
+
     </div>
+
     <div class="footer-bottom">
       <div class="container footer-bottom-inner">
-        <small>© 2026 سُفرة . جميع الحقوق محفوظة</small>
-        <small>صُنع بـ <span aria-hidden="true">♥</span> لرمضان 🌙</small>
+        <small>© 2026 سُفرة .</small>
+        <small>صُنع بـ <span aria-hidden="true">♥</span> لرمضان</small>
       </div>
     </div>
   </footer>

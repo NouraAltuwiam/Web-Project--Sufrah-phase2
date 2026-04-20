@@ -1,7 +1,6 @@
 <?php
 // unblock_user.php
-// Removes a user from the blocked users table
-// Requirement 11d: Unblock link goes to this page
+// Removes a user from the blocked users table.
 
 session_start();
 require_once 'dp.php';
@@ -12,7 +11,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'admin') {
     exit();
 }
 
-// Require a valid blocked user ID in the URL
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header("Location: admin.php");
     exit();

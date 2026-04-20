@@ -1,11 +1,13 @@
 <?php
 // edit_recipe_action.php
-// Requirement 9b: Processes the edit-recipe form, updates DB and files, then redirects to my-recipes.php
+// Requirement: Processes the edit-recipe form - updates recipe info in the database,
+//              replaces old photo/video with new files if uploaded,
+//              then redirects to my-recipes.php.
 
 session_start();
 require 'dp.php';
 
-// Requirement 5: Only logged-in regular users
+// Requirement: Only logged-in regular users can edit recipes
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'user') {
     header("Location: login.php?error=" . urlencode("You must be logged in as a regular user."));
     exit();
@@ -39,64 +41,60 @@ $categoryID  = (int) ($_POST['categoryID'] ?? 0);
 $description = trim($_POST['description'] ?? '');
 
 if ($name === '' || $categoryID === 0 || $description === '') {
-    header("Location: edit-recipe.php?id={$recipeId}&error=" . urlencode("Please fill in all required fields."));
+    header("Location: edit-recipe.php?id={$recipeId}&error=" . urlencode("يرجى تعبئة جميع الحقول المطلوبة."));
     exit();
 }
 
-// Requirement 9b: Handle photo - replace if new one uploaded, otherwise keep existing
+// Requirement: Replace old photo with new one if uploaded, otherwise keep existing
 $photoFileName = $existing['photoFileName'];
 if (isset($_FILES['recipePhoto']) && $_FILES['recipePhoto']['error'] === 0) {
     $photoExt      = strtolower(pathinfo($_FILES['recipePhoto']['name'], PATHINFO_EXTENSION));
     $allowedImages = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
     if (!in_array($photoExt, $allowedImages)) {
-        header("Location: edit-recipe.php?id={$recipeId}&error=" . urlencode("Unsupported image type."));
+        header("Location: edit-recipe.php?id={$recipeId}&error=" . urlencode("نوع الصورة غير مدعوم."));
         exit();
     }
     $photoUploadDir = "images/";
-    if (!is_dir($photoUploadDir)) {
-        mkdir($photoUploadDir, 0777, true);
-    }
-    // Delete old photo file if it was previously uploaded
+    if (!is_dir($photoUploadDir)) mkdir($photoUploadDir, 0777, true);
+
+    // Delete old photo file before saving new one
     if (!empty($existing['photoFileName'])) {
-        $oldPath = "images/" . $existing['photoFileName'];
+        $oldPath = $photoUploadDir . $existing['photoFileName'];
         if (file_exists($oldPath)) unlink($oldPath);
-        $oldPath2 = $photoUploadDir . $existing['photoFileName'];
-        if (file_exists($oldPath2)) unlink($oldPath2);
     }
-    // Incorporate user and recipe IDs in filename to keep it unique (as required)
+
     $photoFileName = "recipe_u{$userId}_r{$recipeId}_" . time() . "." . $photoExt;
     move_uploaded_file($_FILES['recipePhoto']['tmp_name'], $photoUploadDir . $photoFileName);
 }
 
-// Requirement 9b: Handle video - replace if new one uploaded, otherwise keep existing
+// Requirement: Replace old video with new one if uploaded, otherwise keep existing
 $videoFilePath = $existing['videoFilePath'];
 if (isset($_FILES['recipeVideo']) && $_FILES['recipeVideo']['error'] === 0) {
     $videoExt      = strtolower(pathinfo($_FILES['recipeVideo']['name'], PATHINFO_EXTENSION));
     $allowedVideos = ['mp4', 'mov', 'avi', 'mkv', 'webm'];
     if (in_array($videoExt, $allowedVideos)) {
         $videoUploadDir = "videos/";
-        if (!is_dir($videoUploadDir)) {
-            mkdir($videoUploadDir, 0777, true);
-        }
-        // Delete old video file
+        if (!is_dir($videoUploadDir)) mkdir($videoUploadDir, 0777, true);
+
+        // Delete old video file before saving new one
         if (!empty($existing['videoFilePath'])) {
             $oldVideo = $videoUploadDir . $existing['videoFilePath'];
             if (file_exists($oldVideo)) unlink($oldVideo);
         }
+
         $videoFilePath = "video_u{$userId}_r{$recipeId}_" . time() . "." . $videoExt;
         move_uploaded_file($_FILES['recipeVideo']['tmp_name'], $videoUploadDir . $videoFilePath);
     }
 }
 
-// Update the recipe row in the database
-$stmtUpdate = $pdo->prepare("
+// Update the recipe record in the database
+$pdo->prepare("
     UPDATE recipe
     SET categoryID = ?, name = ?, description = ?, photoFileName = ?, videoFilePath = ?
     WHERE id = ? AND userID = ?
-");
-$stmtUpdate->execute([$categoryID, $name, $description, $photoFileName, $videoFilePath, $recipeId, $userId]);
+")->execute([$categoryID, $name, $description, $photoFileName, $videoFilePath, $recipeId, $userId]);
 
-// Replace ingredients: delete old ones and insert the updated set
+// Replace ingredients: delete old and insert updated set
 $pdo->prepare("DELETE FROM ingredients WHERE recipeID = ?")->execute([$recipeId]);
 $ingNames = $_POST['ing_name'] ?? [];
 $ingQtys  = $_POST['ing_qty']  ?? [];
@@ -109,7 +107,7 @@ for ($i = 0; $i < count($ingNames); $i++) {
     }
 }
 
-// Replace instructions: delete old ones and insert the updated set
+// Replace instructions: delete old and insert updated set with stepOrder
 $pdo->prepare("DELETE FROM instructions WHERE recipeID = ?")->execute([$recipeId]);
 $steps    = $_POST['step'] ?? [];
 $stmtStep = $pdo->prepare("INSERT INTO instructions (recipeID, step, stepOrder) VALUES (?, ?, ?)");
@@ -120,7 +118,7 @@ foreach ($steps as $order => $stepText) {
     }
 }
 
-// Redirect to my recipes page on success
+// Requirement: Redirect to my-recipes page on success
 header("Location: my-recipes.php");
 exit();
 ?>

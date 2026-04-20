@@ -1,6 +1,7 @@
 <?php
 // login.php
-// Requirement 4: Login page with single button, checks blocked users and validates credentials
+// Requirement: Login page that checks if user is blocked, validates credentials,
+//              stores session variables, and redirects based on user type.
 
 session_start();
 require_once 'dp.php';
@@ -16,25 +17,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $error = "يرجى تعبئة جميع الحقول";
     } else {
 
-        // Requirement 4: Check if user is blocked first
+        // Requirement: Check blocked users table first - if blocked, deny login
         $stmtBlocked = $pdo->prepare("SELECT id FROM blockeduser WHERE emailAddress = ?");
         $stmtBlocked->execute([$email]);
         if ($stmtBlocked->fetch()) {
             $error = "هذا الحساب محظور. لا يمكنك تسجيل الدخول.";
         } else {
 
-            // Fetch user by email
+            // Requirement: Check email and password - if wrong, show error message
             $stmtUser = $pdo->prepare("SELECT * FROM user WHERE emailAddress = ?");
             $stmtUser->execute([$email]);
             $user = $stmtUser->fetch();
 
             if ($user && password_verify($password, $user['password'])) {
 
-                // Requirement 4: Store user id and type in session variables
+                // Requirement: Store user id and type in session on successful login
                 $_SESSION['user_id']   = $user['id'];
                 $_SESSION['user_type'] = $user['userType'];
 
-                // Redirect based on user type (Requirement 4)
+                // Requirement: Redirect to admin page or user page based on user type
                 if ($user['userType'] === 'admin') {
                     header("Location: admin.php");
                 } else {
@@ -59,6 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </head>
 <body>
 
+  <!-- Header -->
   <header class="site-header">
     <div class="container header-inner">
       <div id="logo">
@@ -74,18 +76,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <div class="container">
     <main class="form-container">
       <h1>تسجيل الدخول</h1>
-      <p class="form-subtitle">يرجى إدخال البريد الإلكتروني وكلمة المرور.</p>
+      <p class="form-subtitle">يرجى إدخال البريد الإلكتروني وكلمة المرور، ثم اختيار نوع الدخول.</p>
 
       <?php if ($error !== ""): ?>
         <p style="color:red; margin-bottom:15px; text-align:center;"><?= htmlspecialchars($error) ?></p>
       <?php endif; ?>
 
-      <!-- Show error passed from other pages via query string -->
-      <?php if (isset($_GET['error']) && $_GET['error'] !== ""): ?>
+      <!-- Show error passed via query string from other pages -->
+      <?php if (!empty($_GET['error'])): ?>
         <p style="color:red; margin-bottom:15px; text-align:center;"><?= htmlspecialchars($_GET['error']) ?></p>
+      <?php elseif (!empty($_GET['msg'])): ?>
+        <p style="color:red; margin-bottom:15px; text-align:center;"><?= htmlspecialchars($_GET['msg']) ?></p>
       <?php endif; ?>
 
-      <!-- Requirement 4: Single login button (not two buttons like Phase 1) -->
+      <!-- Requirement: Single login button - system auto-detects user type from database -->
       <form class="login-form" action="login.php" method="POST">
 
         <div class="form-group">
@@ -115,20 +119,36 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
   <footer class="site-footer" role="contentinfo">
     <div class="container footer-inner">
+
       <div class="footer-col footer-about">
         <div class="footer-brand">
           <img src="images/logo.png" alt="شعار سُفرة" class="footer-logo">
           <h3 class="footer-title">سُفرة</h3>
         </div>
-        <p class="footer-text">منصة وصفات رمضانية تساعدك توصل لوصفات الإفطار والسحور بطريقة مرتبة وبسيطة.</p>
+        <p class="footer-text">
+          منصة وصفات رمضانية تساعدك توصل لوصفات الإفطار والسحور بطريقة مرتبة وبسيطة.
+        </p>
       </div>
+
       <div class="footer-col">
         <h4 class="footer-heading">استكشاف</h4>
         <ul class="footer-links">
           <li><a href="index.php">الرئيسية</a></li>
-          <li><a href="signup.php">إنشاء حساب</a></li>
+          <li><a href="my-recipes.php">وصفاتي</a></li>
+          <li><a href="add-recipe.php">إضافة وصفة</a></li>
+          <li><a href="login.php">تسجيل الدخول</a></li>
         </ul>
       </div>
+
+      <div class="footer-col">
+        <h4 class="footer-heading">التصنيفات</h4>
+        <ul class="footer-links">
+          <li><a href="index.php">إفطار</a></li>
+          <li><a href="index.php">سحور</a></li>
+          <li><a href="index.php">حلويات</a></li>
+        </ul>
+      </div>
+
       <div class="footer-col">
         <h4 class="footer-heading">تواصل معنا</h4>
         <div class="footer-social">
@@ -139,7 +159,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
         <p class="footer-mini">البريد: <a href="mailto:sufrah@example.com">sufrah@example.com</a></p>
       </div>
+
     </div>
+
     <div class="footer-bottom">
       <div class="container footer-bottom-inner">
         <small>© 2026 سُفرة .</small>
