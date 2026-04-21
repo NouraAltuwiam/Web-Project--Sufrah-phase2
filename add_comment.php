@@ -35,7 +35,7 @@ if (!$stmtCheck->fetch()) {
 }
 
 // Requirement: Insert the new comment into the database
-$stmt = $pdo->prepare("INSERT INTO comment (recipeID, userID, comment, date) VALUES (?, ?, ?, CURDATE())");
+$stmt = $pdo->prepare("INSERT INTO comment (recipeID, userID, comment, date) VALUES (?, ?, ?, NOW())");
 $stmt->execute([$recipeId, $userId, $comment]);
 
 // Requirement: Redirect back to view-recipe page for this recipe
