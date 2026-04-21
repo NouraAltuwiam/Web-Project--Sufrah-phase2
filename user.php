@@ -112,6 +112,9 @@ $favourites = $stmt_favourites->fetchAll();
         <img src="images/logo.png" alt="Logo">
         <span>سُفــــرة</span>
       </div>
+        <nav class="nav">
+        <a class="nav-chip" href="index.php"> الرئيسية</a>
+      </nav>
       <!-- Requirement: Security - sign-out clears session -->
       <a href="signout.php" class="sign-out">تسجيل الخروج</a>
     </div>
