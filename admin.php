@@ -67,8 +67,8 @@ $blockedUsers = $stmtBlocked->fetchAll();
         <img src="images/logo.png" alt="Logo">
         <span>سُفــــرة</span>
       </div>
-      <nav class="nav">
-        <a class="nav-chip is-active" href="admin.php">لوحة الإدارة</a>
+       <nav class="nav">
+        <a class="nav-chip" href="index.php"> الرئيسية</a>
       </nav>
       <!-- Requirement: Sign-out clears session and redirects to homepage -->
       <a href="signout.php" class="sign-out">تسجيل الخروج</a>
