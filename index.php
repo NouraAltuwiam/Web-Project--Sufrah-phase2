@@ -33,6 +33,21 @@ $stmtReels = $pdo->query("
     LIMIT 3
 ");
 $reels = $stmtReels->fetchAll();
+
+$mapRecipeIds = [
+    'شوربة حريرة' => 18,
+    'كسكس' => 19,
+    'كنافة' => 2,
+    'منسف' => 20,
+    'البازين' => 21,
+    'كبسة' => 1,
+    'هريس' => 3,
+    'آش رشتة' => 22,
+    'دال وخبز' => 23,
+    'عصيدة' => 24,
+    'مسكوف' => 25,
+    'سمبوسة صومالية' => 26
+];
 ?>
 <!doctype html>
 <html lang="ar" dir="rtl">
@@ -178,18 +193,41 @@ $reels = $stmtReels->fetchAll();
       <div class="map-container">
         <img src="images/map.jpg" class="world-map" alt="خريطة العالم الإسلامي">
 
-        <div class="map-point" data-code="MA" style="top:23%;left:15%;" onclick="showCard('المغرب','شوربة حريرة','images/harira.jpg')"></div>
-        <div class="map-point" data-code="DZ" style="top:28%;left:31%;" onclick="showCard('الجزائر','كسكس','images/couscus.jpg')"></div>
-        <div class="map-point" data-code="EG" style="top:30%;left:62%;" onclick="showCard('مصر','كنافة','images/kunafa.jpg')"></div>
-        <div class="map-point" data-code="JO" style="top:14%;left:68%;" onclick="showCard('الاردن','منسف','images/mansaf.jpg')"></div>
-        <div class="map-point" data-code="LY" style="top:28%;left:47%;" onclick="showCard('ليبيا','البازين','images/bazin.jpg')"></div>
-        <div class="map-point" data-code="KSA" style="top:32%;left:79%;" onclick="showCard('المملكة العربية السعودية','كبسة','images/kabsa.jpg')"></div>
-        <div class="map-point" data-code="UAE" style="top:32%;left:89%;" onclick="showCard('الإمارات','هريس','images/harees.jpg')"></div>
-        <div class="map-point" data-code="IR"  style="top:15%;left:90%;" onclick="showCard('إيران','آش رشتة','images/ash.jpg')"></div>
-        <div class="map-point" data-code="PK"  style="top:20%;left:98.7%;" onclick="showCard('باكستان','دال وخبز','images/dal.jpg')"></div>
-        <div class="map-point" data-code="SD"  style="top:55%;left:62%;" onclick="showCard('السودان','عصيدة','images/asida.jpg')"></div>
-        <div class="map-point" data-code="IRQ" style="top:12%;left:76%;" onclick="showCard('العراق','مسكوف','images/masgouf.jpg')"></div>
-        <div class="map-point" data-code="SO"  style="top:74%;left:81.9%;" onclick="showCard('الصومال','سمبوسة صومالية','images/samosa.jpg')"></div>
+       <div class="map-point" data-code="MA" style="top:23%;left:15%;"
+            onclick="showCard('المغرب','شوربة حريرة','images/harira.jpg', <?= $mapRecipeIds['شوربة حريرة'] ?>)"></div>
+
+       <div class="map-point" data-code="DZ" style="top:28%;left:31%;"
+            onclick="showCard('الجزائر','كسكس','images/couscus.jpg', <?= $mapRecipeIds['كسكس'] ?>)"></div>
+
+       <div class="map-point" data-code="EG" style="top:30%;left:62%;"
+            onclick="showCard('مصر','كنافة','images/kunafa.jpg', <?= $mapRecipeIds['كنافة'] ?>)"></div>
+
+       <div class="map-point" data-code="JO" style="top:14%;left:68%;"
+            onclick="showCard('الاردن','منسف','images/mansaf.jpg', <?= $mapRecipeIds['منسف'] ?>)"></div>
+
+       <div class="map-point" data-code="LY" style="top:28%;left:47%;"
+            onclick="showCard('ليبيا','البازين','images/bazin.jpg', <?= $mapRecipeIds['البازين'] ?>)"></div>
+
+       <div class="map-point" data-code="KSA" style="top:32%;left:79%;"
+            onclick="showCard('المملكة العربية السعودية','كبسة','images/kabsa.jpg', <?= $mapRecipeIds['كبسة'] ?>)"></div>
+
+       <div class="map-point" data-code="UAE" style="top:32%;left:89%;"
+            onclick="showCard('الإمارات','هريس','images/harees.jpg', <?= $mapRecipeIds['هريس'] ?>)"></div>
+
+       <div class="map-point" data-code="IR" style="top:15%;left:90%;"
+            onclick="showCard('إيران','آش رشتة','images/ash.jpg', <?= $mapRecipeIds['آش رشتة'] ?>)"></div>
+
+       <div class="map-point" data-code="PK" style="top:20%;left:98.7%;"
+            onclick="showCard('باكستان','دال وخبز','images/dal.jpg', <?= $mapRecipeIds['دال وخبز'] ?>)"></div>
+
+       <div class="map-point" data-code="SD" style="top:55%;left:62%;"
+            onclick="showCard('السودان','عصيدة','images/asida.jpg', <?= $mapRecipeIds['عصيدة'] ?>)"></div>
+
+       <div class="map-point" data-code="IRQ" style="top:12%;left:76%;"
+            onclick="showCard('العراق','مسكوف','images/masgouf.jpg', <?= $mapRecipeIds['مسكوف'] ?>)"></div>
+
+       <div class="map-point" data-code="SO" style="top:74%;left:81.9%;"
+            onclick="showCard('الصومال','سمبوسة صومالية','images/samosa.jpg', <?= $mapRecipeIds['سمبوسة صومالية'] ?>)"></div>
       </div>
     </section>
 
@@ -204,10 +242,10 @@ $reels = $stmtReels->fetchAll();
       <h3 id="cardTitle"></h3>
       <p id="cardDesc"></p>
       <?php if ($isLoggedIn): ?>
-        <a href="user.php" class="recipe-card-btn">استكشف الوصفات</a>
+    <a id="cardLink" href="#" class="recipe-card-btn">استكشف الوصفة</a>
       <?php else: ?>
-        <a href="login.php" class="recipe-card-btn">سجّل الدخول للمزيد</a>
-      <?php endif; ?>
+      <a href="login.php" class="recipe-card-btn">سجّل الدخول للمزيد</a>
+    <?php endif; ?>
     </div>
   </div>
 
@@ -266,14 +304,31 @@ $reels = $stmtReels->fetchAll();
 
   <script>
     // Map popup functions
-    function showCard(country, dish, img) {
-      document.getElementById('cardTitle').innerText = country;
-      document.getElementById('cardDesc').innerText  = dish;
-      document.getElementById('cardImg').src         = img;
-      document.getElementById('recipeCard').style.display = 'block';
-      document.getElementById('cardOverlay').classList.add('active');
-      document.body.style.overflow = 'hidden';
+  function showCard(country, dish, img, recipeId) {
+    document.getElementById('cardTitle').innerText = country;
+    document.getElementById('cardDesc').innerText  = dish;
+    document.getElementById('cardImg').src         = img;
+
+    const link = document.getElementById('cardLink');
+    if (link) {
+      link.href = 'view-recipe.php?id=' + recipeId;
     }
+
+    document.getElementById('recipeCard').style.display = 'block';
+    document.getElementById('cardOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCard() {
+    document.getElementById('recipeCard').style.display = 'none';
+    document.getElementById('cardOverlay').classList.remove('active');
+    document.body.style.overflow = 'auto';
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeCard();
+  });
+
     function closeCard() {
       document.getElementById('recipeCard').style.display = 'none';
       document.getElementById('cardOverlay').classList.remove('active');
