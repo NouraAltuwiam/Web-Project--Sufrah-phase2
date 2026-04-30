@@ -145,9 +145,8 @@ $recipes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                   </td>
                   <td>
                     <!-- Requirement: Delete link is a generated link to delete-recipe.php -->
-                    <a class="link"
-                       href="delete-recipe.php?id=<?= (int)$recipe['id'] ?>"
-                       onclick="return confirm('هل أنت متأكد من حذف هذه الوصفة؟');">حذف</a>
+                    <button class="delete-btn link"
+        data-id="<?= (int)$recipe['id'] ?>">حذف</button>
                   </td>
                 </tr>
               <?php endforeach; ?>
@@ -211,6 +210,30 @@ $recipes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       </div>
     </div>
   </footer>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+$(document).on('click', '.delete-btn', function () {
 
+    if (!confirm("هل أنت متأكد من الحذف؟")) return;
+
+    let button = $(this);
+    let recipeId = button.data('id');
+
+    $.ajax({
+        url: 'ajax-delete-recipe.php',
+        type: 'POST',
+        data: { id: recipeId },
+
+        success: function (response) {
+            if (response === "true") {
+                // حذف الصف من الجدول
+                button.closest('tr').remove();
+            } else {
+                alert("فشل الحذف");
+            }
+        }
+    });
+});
+</script>
 </body>
 </html>
