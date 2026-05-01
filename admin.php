@@ -1,6 +1,6 @@
 <?php
 // admin.php
-// Requirement: Admin dashboard - shows welcome info, reports table, and blocked users table.
+// Phase 3: Admin dashboard with AJAX for report actions
 
 session_start();
 require_once 'dp.php';
@@ -57,6 +57,8 @@ $blockedUsers = $stmtBlocked->fetchAll();
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>سفرة - لوحة الإدارة</title>
   <link rel="stylesheet" href="style.css">
+  <!-- jQuery for AJAX (Phase 3) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
 
@@ -152,9 +154,9 @@ $blockedUsers = $stmtBlocked->fetchAll();
           </thead>
           <tbody>
             <?php foreach ($reports as $report): ?>
-            <tr>
+            <!-- Phase 3: data-report-id attribute used by AJAX to identify the row -->
+            <tr data-report-id="<?= (int)$report['reportID'] ?>">
               <td>
-                <!-- Requirement: Recipe name is a generated link to view-recipe page -->
                 <a href="view-recipe.php?id=<?= (int)$report['recipeID'] ?>" class="recipe-name-link">
                   <?= htmlspecialchars($report['recipeName']) ?>
                 </a>
@@ -177,17 +179,15 @@ $blockedUsers = $stmtBlocked->fetchAll();
                 </div>
               </td>
               <td>
-                <!-- Requirement: Action form includes recipe ID as hidden input, submits to handle_report.php -->
-                <!-- Requirement: Actions are block user or dismiss report -->
-                <form action="handle_report.php" method="POST">
-                  <input type="hidden" name="reportID" value="<?= (int)$report['reportID'] ?>">
-                  <input type="hidden" name="recipeID" value="<?= (int)$report['recipeID'] ?>">
-                  <input type="hidden" name="ownerID"  value="<?= (int)$report['ownerID'] ?>">
-                  <div class="action-buttons">
-                    <button type="submit" name="action" value="block"   class="block-btn">حظر المستخدم</button>
-                    <button type="submit" name="action" value="dismiss" class="dismiss-btn">رفض البلاغ</button>
-                  </div>
-                </form>
+                <!-- Phase 3: Buttons trigger AJAX instead of form submission -->
+                <!-- Hidden inputs carry all required data -->
+                <div class="action-buttons"
+                     data-report-id="<?= (int)$report['reportID'] ?>"
+                     data-recipe-id="<?= (int)$report['recipeID'] ?>"
+                     data-owner-id="<?= (int)$report['ownerID'] ?>">
+                  <button type="button" class="block-btn report-action-btn"   data-action="block">حظر المستخدم</button>
+                  <button type="button" class="dismiss-btn report-action-btn" data-action="dismiss">رفض البلاغ</button>
+                </div>
               </td>
             </tr>
             <?php endforeach; ?>
@@ -287,6 +287,57 @@ $blockedUsers = $stmtBlocked->fetchAll();
       </div>
     </div>
   </footer>
+
+  <!-- =====================================================================
+       Phase 3: AJAX for Admin Report Actions (using jQuery)
+       - Clicking block/dismiss sends AJAX POST to handle_report.php
+       - On success (response === true), removes the row from the HTML table
+       - Page does NOT reload
+  ====================================================================== -->
+  <script>
+  $(document).ready(function () {
+
+    // Listen for click on any report action button
+    $(document).on('click', '.report-action-btn', function () {
+      var $btn       = $(this);
+      var $container = $btn.closest('.action-buttons');
+      var $row       = $btn.closest('tr');
+
+      var action    = $btn.data('action');
+      var reportID  = $container.data('report-id');
+      var recipeID  = $container.data('recipe-id');
+      var ownerID   = $container.data('owner-id');
+
+      // Disable both buttons while request is in-flight
+      $container.find('.report-action-btn').prop('disabled', true);
+
+      $.ajax({
+        url: 'handle_report.php',
+        type: 'POST',
+        data: {
+          action:   action,
+          reportID: reportID,
+          recipeID: recipeID,
+          ownerID:  ownerID
+        },
+        success: function (response) {
+          // Phase 3 requirement: if response is true, remove the row from the HTML table
+          if (response === true) {
+            $row.remove();
+          } else {
+            // Re-enable buttons if action failed
+            $container.find('.report-action-btn').prop('disabled', false);
+          }
+        },
+        error: function () {
+          // Re-enable buttons on network error
+          $container.find('.report-action-btn').prop('disabled', false);
+        }
+      });
+    });
+
+  });
+  </script>
 
 </body>
 </html>
