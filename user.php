@@ -64,16 +64,9 @@ $group_sql = " GROUP BY r.id, r.name, r.photoFileName,
                          u.firstName, u.lastName, u.photoFileName, c.categoryName
                ORDER BY r.id DESC";
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_id']) && $_POST['category_id'] !== '') {
-    // Requirement: POST - retrieve only recipes in the selected category
-    $selected_category_id = (int) $_POST['category_id'];
-    $stmt_recipes = $pdo->prepare($base_sql . " WHERE r.categoryID = ?" . $group_sql);
-    $stmt_recipes->execute([$selected_category_id]);
-} else {
-    // Requirement: GET - retrieve all recipes in the database
-    $stmt_recipes = $pdo->prepare($base_sql . $group_sql);
-    $stmt_recipes->execute();
-}
+// Requirement: Retrieve all recipes (AJAX handles filtering)
+$stmt_recipes = $pdo->prepare($base_sql . $group_sql);
+$stmt_recipes->execute();
 
 $recipes = $stmt_recipes->fetchAll();
 
@@ -192,7 +185,7 @@ $favourites = $stmt_favourites->fetchAll();
 
       <div class="filter-bar">
         <!-- Requirement: Filter form - POST to same page with selected category -->
-        <form method="POST" action="user.php" class="filter-form">
+        <form class="filter-form" onsubmit="return false;">
           <img src="images/filter.svg" class="icon-sm" alt="تصفية">
           <label for="categoryFilter" class="filter-label">تصفية حسب الفئة:</label>
 
@@ -207,7 +200,7 @@ $favourites = $stmt_favourites->fetchAll();
             <?php endforeach; ?>
           </select>
 
-          <button class="filter-button" type="submit">تصفية</button>
+         
         </form>
       </div>
 
@@ -224,7 +217,7 @@ $favourites = $stmt_favourites->fetchAll();
               <th>الفئة</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="recipesBody">
             <?php foreach ($recipes as $recipe): ?>
               <tr>
                 <td>
@@ -283,31 +276,31 @@ $favourites = $stmt_favourites->fetchAll();
               <th>إجراء</th>
             </tr>
           </thead>
-          <tbody>
-            <?php foreach ($favourites as $fav): ?>
-              <tr>
-                <td>
-                  <!-- Requirement: Favourite recipe name is a link to view-recipe page -->
-                  <a href="view-recipe.php?id=<?= (int)$fav['id'] ?>" class="fav-name">
-                    <?= htmlspecialchars($fav['name']) ?>
-                  </a>
-                </td>
-                <td>
-                  <img class="thumb-img"
-                       src="images/<?= htmlspecialchars($fav['photoFileName']) ?>"
-                       alt="<?= htmlspecialchars($fav['name']) ?>"
-                       onerror="this.src='images/default.png'">
-                </td>
-                <td>
-                  <!-- Requirement: Remove link deletes recipe from favourites and redirects to user page -->
-                  <a href="remove-favourite.php?recipe_id=<?= (int)$fav['id'] ?>"
-                     onclick="return confirm('هل تريد حذف هذه الوصفة من المفضلة؟');">
-                    <button class="block-btn" type="button">حذف</button>
-                  </a>
-                </td>
-              </tr>
-            <?php endforeach; ?>
-          </tbody>
+            <tbody>
+         <?php foreach ($favourites as $fav): ?>
+           <tr id="fav-row-<?= (int)$fav['id'] ?>">
+             <td>
+               <a href="view-recipe.php?id=<?= (int)$fav['id'] ?>" class="fav-name">
+                 <?= htmlspecialchars($fav['name']) ?>
+               </a>
+             </td>
+
+             <td>
+               <img class="thumb-img"
+                    src="images/<?= htmlspecialchars($fav['photoFileName']) ?>"
+                    alt="<?= htmlspecialchars($fav['name']) ?>">
+             </td>
+
+             <td>
+               <button class="block-btn remove-fav-btn"
+                       type="button"
+                       data-id="<?= (int)$fav['id'] ?>">
+                 حذف
+               </button>
+             </td>
+           </tr>
+         <?php endforeach; ?>
+</tbody>
         </table>
       <?php else: ?>
         <p>لا توجد وصفات مفضلة لديك.</p>
@@ -365,6 +358,95 @@ $favourites = $stmt_favourites->fetchAll();
       </div>
     </div>
   </footer>
+  <script>
+document.getElementById("categoryFilter").addEventListener("change", function () {
+    let categoryId = this.value;
 
+    fetch("ajax-filter-recipes.php?category_id=" + categoryId)
+        .then(response => response.json())
+        .then(recipes => {
+            let tbody = document.getElementById("recipesBody");
+            tbody.innerHTML = "";
+
+            if (recipes.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5">لا توجد وصفات في هذه الفئة.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            recipes.forEach(recipe => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>
+                            <a href="view-recipe.php?id=${recipe.id}" class="recipe-name-link">
+                                ${recipe.name}
+                            </a>
+                        </td>
+                        <td>
+                            <img class="thumb-img" src="images/${recipe.photoFileName}" 
+                                 onerror="this.src='images/default.png'">
+                        </td>
+                        <td>
+                            <div class="creator-info">
+                                <img src="images/${recipe.userPhoto || 'default.png'}"
+                                     class="creator-photo"
+                                     onerror="this.src='images/default.png'">
+                                <span class="creator-name">
+                                    ${recipe.firstName} ${recipe.lastName}
+                                </span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="likes-count">
+                                <img src="images/heart.svg" class="likes-heart" alt="إعجاب">
+                                ${recipe.totalLikes}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="reel-category">${recipe.categoryName}</span>
+                        </td>
+                    </tr>
+                `;
+            });
+        });
+});
+
+
+document.querySelectorAll(".remove-fav-btn").forEach(button => {
+    button.addEventListener("click", function () {
+        if (!confirm("هل تريد حذف هذه الوصفة من المفضلة؟")) {
+            return;
+        }
+
+        let recipeId = this.dataset.id;
+
+        fetch("ajax-remove-favourite.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "recipe_id=" + recipeId
+        })
+        .then(response => response.json())
+       .then(result => {
+    if (result === true) {
+
+        document.getElementById("fav-row-" + recipeId).remove();
+
+        if (document.querySelectorAll(".favorites-table tbody tr").length === 0) {
+            document.querySelector(".favorites-table").outerHTML =
+                "<p>لا توجد وصفات مفضلة لديك.</p>";
+        }
+
+    } else {
+        alert("لم يتم حذف الوصفة.");
+    }
+});
+    });
+});
+</script>
 </body>
 </html>
