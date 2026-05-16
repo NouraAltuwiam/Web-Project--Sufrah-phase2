@@ -1,14 +1,9 @@
 <?php
-$host     = "localhost";
-$dbname   = "recipes_db";
-$username = "root";
-$password = "";
+$host = 'sql208.infinityfree.com';
+$db   = 'if0_41938939_sufrah';
+$user = 'if0_41938939';
+$pass = 'كلمة مرور الـ vPanel';
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    die("فشل الاتصال بقاعدة البيانات: " . $e->getMessage());
-}
+$pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass);
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 ?>
