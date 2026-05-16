@@ -62,8 +62,8 @@ $mapRecipeIds = [
   <header class="site-header">
     <div class="container header-inner">
       <div id="logo">
-        <img src="images/logo.png" alt="Logo">
-        <span>سُفــــرة</span>
+        <a href = "https://sufrah.infinityfreeapp.com/"><img src="images/logo.png" alt="Logo"></a>
+            <span>سُفــــرة</span>
       </div>
 
       <nav class="nav">
@@ -89,7 +89,7 @@ $mapRecipeIds = [
     <section class="welcome-section">
       <div class="welcome-inner">
         <div class="welcome-logo">
-          <img src="images/logo.png" alt="شعار سُفرة" class="welcome-logo-img">
+            <a href = "https://sufrah.infinityfreeapp.com/"><img src="images/logo.png" alt="شعار سُفرة" class="welcome-logo-img"></a>
         </div>
 
         <?php if ($isLoggedIn && $loggedName !== ''): ?>
