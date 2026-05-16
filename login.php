@@ -64,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <header class="site-header">
     <div class="container header-inner">
       <div id="logo">
-        <img src="images/logo.png" alt="Logo">
+          <a href = "https://sufrah.infinityfreeapp.com/"><img src="images/logo.png" alt="Logo"></a>
         <span>سُفــــرة</span>
       </div>
       <nav class="nav">
