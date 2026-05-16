@@ -1,13 +1,8 @@
 <?php
 // view-recipe.php
-// Requirement: Displays all recipe info. Shows favourite/like/report buttons
-//              only for regular users. Disables each button if already used.
-//              Includes a comment form that submits to add_comment.php.
-
 session_start();
 require 'dp.php';
 
-// Requirement: Only logged-in users can view recipes
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php?error=" . urlencode("You must be logged in to view recipes."));
     exit();
@@ -16,7 +11,6 @@ if (!isset($_SESSION['user_id'])) {
 $viewerId   = (int) $_SESSION['user_id'];
 $viewerType = $_SESSION['user_type'] ?? '';
 
-// Requirement: Check the recipe ID from the query string
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header("Location: " . ($viewerType === 'admin' ? 'admin.php' : 'user.php'));
     exit();
@@ -24,7 +18,6 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $recipeId = (int) $_GET['id'];
 
-// Requirement: Retrieve all recipe info from the database
 $stmtRecipe = $pdo->prepare("
     SELECT r.*, u.firstName, u.lastName, u.photoFileName AS creatorPhoto, u.id AS creatorID,
            rc.categoryName
@@ -41,17 +34,14 @@ if (!$recipe) {
     exit();
 }
 
-// Retrieve ingredients
 $ingStmt = $pdo->prepare("SELECT ingredientName, ingredientQuantity FROM ingredients WHERE recipeID = ?");
 $ingStmt->execute([$recipeId]);
 $ingredients = $ingStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Retrieve instructions ordered by step number
 $instStmt = $pdo->prepare("SELECT step, stepOrder FROM instructions WHERE recipeID = ? ORDER BY stepOrder ASC");
 $instStmt->execute([$recipeId]);
 $instructions = $instStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Retrieve comments with commenter info
 $commentStmt = $pdo->prepare("
     SELECT c.comment, c.date, u.firstName, u.lastName, u.photoFileName AS commenterPhoto
     FROM comment c
@@ -62,7 +52,6 @@ $commentStmt = $pdo->prepare("
 $commentStmt->execute([$recipeId]);
 $comments = $commentStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Count total likes and favourites
 $stmtLikeCount = $pdo->prepare("SELECT COUNT(*) FROM likes WHERE recipeID = ?");
 $stmtLikeCount->execute([$recipeId]);
 $totalLikes = (int) $stmtLikeCount->fetchColumn();
@@ -71,12 +60,10 @@ $stmtFavCount = $pdo->prepare("SELECT COUNT(*) FROM favourites WHERE recipeID = 
 $stmtFavCount->execute([$recipeId]);
 $totalFavs = (int) $stmtFavCount->fetchColumn();
 
-// Requirement: Only show action buttons if viewer is a regular user (not creator, not admin)
 $isCreator   = ($viewerId === (int) $recipe['creatorID']);
 $isAdmin     = ($viewerType === 'admin');
 $showButtons = (!$isCreator && !$isAdmin);
 
-// Requirement: Check if viewer already liked, favourited, or reported - disable button if so
 $alreadyLiked    = false;
 $alreadyFaved    = false;
 $alreadyReported = false;
@@ -107,7 +94,6 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
 </head>
 <body>
 
-  <!-- Header -->
   <header class="site-header">
     <div class="container header-inner">
       <div id="logo">
@@ -134,7 +120,6 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
 
     <div class="main-grid">
 
-      <!-- Recipe details card -->
       <section class="user-info-card">
         <div class="recipe-top">
           <div class="recipe-photo">
@@ -150,30 +135,44 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
             <?php if ($showButtons): ?>
               <div class="recipe-actions">
 
-                <!-- Requirement: Disable favourite button if user already added recipe to favourites -->
+                <!-- Requirement: AJAX favourite button - disabled if already favourited -->
                 <?php if ($alreadyFaved): ?>
                   <button class="filter-button" type="button" disabled>✅ في المفضلة</button>
                 <?php else: ?>
-                  <!-- Requirement: Clicking favourite sends request to add_favourite.php -->
-                  <a href="add_favourite.php?recipe_id=<?= $recipeId ?>" class="filter-button">إضافة للمفضلة ❤️</a>
+                  <button class="filter-button ajax-btn"
+                          type="button"
+                          data-action="add_favourite.php"
+                          data-recipe="<?= $recipeId ?>"
+                          data-done="✅ في المفضلة">
+                    إضافة للمفضلة ❤️
+                  </button>
                 <?php endif; ?>
 
-                <!-- Requirement: Disable like button if user already liked this recipe -->
+                <!-- Requirement: AJAX like button - disabled if already liked -->
                 <?php if ($alreadyLiked): ?>
                   <button class="filter-button" type="button" disabled>✅ أعجبك</button>
                 <?php else: ?>
-                  <!-- Requirement: Clicking like sends request to add_like.php -->
-                  <a href="add_like.php?recipe_id=<?= $recipeId ?>" class="filter-button">إعجاب 👍</a>
+                  <button class="filter-button ajax-btn"
+                          type="button"
+                          data-action="add_like.php"
+                          data-recipe="<?= $recipeId ?>"
+                          data-done="✅ أعجبك">
+                    إعجاب 👍
+                  </button>
                 <?php endif; ?>
 
-                <!-- Requirement: Disable report button if user already reported this recipe -->
+                <!-- Requirement: AJAX report button - disabled if already reported -->
                 <?php if ($alreadyReported): ?>
                   <button class="filter-button" type="button" disabled>⏳ تم الإبلاغ</button>
                 <?php else: ?>
-                  <!-- Requirement: Clicking report sends request to add_report.php -->
-                  <a href="add_report.php?recipe_id=<?= $recipeId ?>"
-                     class="filter-button"
-                     onclick="return confirm('هل تريد الإبلاغ عن هذه الوصفة؟');">إبلاغ 🚩</a>
+                  <button class="filter-button ajax-btn"
+                          type="button"
+                          data-action="add_report.php"
+                          data-recipe="<?= $recipeId ?>"
+                          data-done="⏳ تم الإبلاغ"
+                          data-confirm="هل تريد الإبلاغ عن هذه الوصفة؟">
+                    إبلاغ 🚩
+                  </button>
                 <?php endif; ?>
 
               </div>
@@ -181,7 +180,6 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
           </div>
         </div>
 
-        <!-- Creator, category and description info -->
         <div class="info-grid">
           <div class="info-item">
             <div class="info-icon">👩‍🍳</div>
@@ -222,7 +220,6 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
         </div>
       </section>
 
-      <!-- Quick stats side card -->
       <section class="my-recipes-card">
         <h3>معلومات سريعة</h3>
         <div class="stats-boxes">
@@ -243,7 +240,6 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
 
     </div>
 
-    <!-- Ingredients table -->
     <section class="all-recipes-section">
       <h2 class="section-title">المكونات</h2>
       <?php if (!empty($ingredients)): ?>
@@ -264,7 +260,6 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
         <p>لا توجد مكونات مضافة.</p>
       <?php endif; ?>
 
-      <!-- Healthy alternatives box (shown if recipe has alternatives stored) -->
       <div class="healthy-box">
         <div class="healthy-num">🌿</div>
         <div class="healthy-content">
@@ -274,7 +269,6 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
       </div>
     </section>
 
-    <!-- Instructions -->
     <section class="all-recipes-section">
       <h2 class="section-title">طريقة التحضير</h2>
       <?php if (!empty($instructions)): ?>
@@ -291,7 +285,6 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
       <?php endif; ?>
     </section>
 
-    <!-- Video section -->
     <?php if (!empty($recipe['videoFilePath'])): ?>
       <section class="all-recipes-section">
         <h2 class="section-title">الفيديو</h2>
@@ -308,18 +301,15 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
       </section>
     <?php endif; ?>
 
-    <!-- Requirement: Comment form - recipe ID included as hidden input -->
     <section class="favorites-section">
       <h2 class="section-title">التعليقات</h2>
 
-      <!-- Requirement: Form submits to add_comment.php which adds comment to DB and redirects here -->
       <form action="add_comment.php" method="POST" class="comment-box">
         <input type="hidden" name="recipe_id" value="<?= $recipeId ?>">
         <input type="text" name="comment" class="comment-input" placeholder="اكتب تعليقك هنا..." required />
         <button class="filter-button" type="submit">إضافة تعليق</button>
       </form>
 
-      <!-- Display existing comments -->
       <div class="comments-list">
         <?php if (!empty($comments)): ?>
           <?php foreach ($comments as $c): ?>
@@ -346,7 +336,6 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
 
   <footer class="site-footer" role="contentinfo">
     <div class="container footer-inner">
-
       <div class="footer-col footer-about">
         <div class="footer-brand">
           <img src="images/logo.png" alt="شعار سُفرة" class="footer-logo">
@@ -354,7 +343,6 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
         </div>
         <p class="footer-text">منصة وصفات رمضانية تساعدك توصل لوصفات الإفطار والسحور بطريقة مرتبة وبسيطة.</p>
       </div>
-
       <div class="footer-col">
         <h4 class="footer-heading">استكشاف</h4>
         <ul class="footer-links">
@@ -365,7 +353,6 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
           <?php endif; ?>
         </ul>
       </div>
-
       <div class="footer-col">
         <h4 class="footer-heading">التصنيفات</h4>
         <ul class="footer-links">
@@ -374,7 +361,6 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
           <li><a href="user.php">حلويات</a></li>
         </ul>
       </div>
-
       <div class="footer-col">
         <h4 class="footer-heading">تواصل معنا</h4>
         <div class="footer-social">
@@ -385,9 +371,7 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
         </div>
         <p class="footer-mini">البريد: <a href="mailto:sufrah@example.com">sufrah@example.com</a></p>
       </div>
-
     </div>
-
     <div class="footer-bottom">
       <div class="container footer-bottom-inner">
         <small>© 2026 سُفرة .</small>
@@ -395,6 +379,56 @@ $backLink = ($viewerType === 'admin') ? 'admin.php' : 'user.php';
       </div>
     </div>
   </footer>
+
+  <!-- Requirement: AJAX for favourite, like, and report buttons.
+       On success (true returned), disable the clicked button and update its text. -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      document.querySelectorAll('.ajax-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+
+          // Show confirm dialog if button has data-confirm attribute (report button)
+          const confirmMsg = this.dataset.confirm;
+          if (confirmMsg && !confirm(confirmMsg)) return;
+
+          const action   = this.dataset.action;
+          const recipeId = this.dataset.recipe;
+          const doneText = this.dataset.done;
+          const self     = this;
+
+          // Disable button immediately to prevent double clicks
+          self.disabled = true;
+
+          // Requirement: Send AJAX POST request to the corresponding PHP page
+          fetch(action, {
+            method : 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body   : 'recipe_id=' + encodeURIComponent(recipeId)
+          })
+          .then(function (response) { return response.json(); })
+          .then(function (success) {
+
+            // Requirement: If PHP returns true, disable the button
+            if (success === true) {
+              self.textContent = doneText;
+              self.disabled    = true;
+            } else {
+              // Re-enable if failed
+              self.disabled = false;
+              alert('حدث خطأ. يرجى المحاولة مرة أخرى.');
+            }
+          })
+          .catch(function () {
+            self.disabled = false;
+            alert('تعذّر الاتصال بالخادم.');
+          });
+
+        });
+      });
+
+    });
+  </script>
 
 </body>
 </html>
