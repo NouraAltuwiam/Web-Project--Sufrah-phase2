@@ -226,7 +226,6 @@ $(document).on('click', '.delete-btn', function () {
 
         success: function (response) {
             if (response === "true") {
-                // حذف الصف من الجدول
                 button.closest('tr').remove();
             } else {
                 alert("فشل الحذف");

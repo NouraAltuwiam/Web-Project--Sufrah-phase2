@@ -1,43 +1,36 @@
 <?php
 // add_favourite.php
-// Requirement: Adds a recipe to the user's favourites in the database,
-//              then redirects back to view-recipe.php for the same recipe.
+// Requirement: Receives AJAX POST request, adds recipe to favourites, returns true/false as JSON.
 
 session_start();
 require 'dp.php';
 
-// Requirement: Must be logged in as a regular user
+header('Content-Type: application/json');
+
 if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'user') {
-    header("Location: login.php?error=" . urlencode("You must be logged in to add favourites."));
+    echo json_encode(false);
     exit();
 }
 
 $userId   = (int) $_SESSION['user_id'];
-$recipeId = (int) ($_GET['recipe_id'] ?? 0);
+$recipeId = isset($_POST['recipe_id']) && is_numeric($_POST['recipe_id'])
+            ? (int) $_POST['recipe_id'] : 0;
 
-if ($recipeId === 0) {
-    header("Location: user.php");
+if ($recipeId <= 0) {
+    echo json_encode(false);
     exit();
 }
 
-// Verify the recipe exists and the user is not the creator
-$stmtCheck = $pdo->prepare("SELECT userID FROM recipe WHERE id = ?");
-$stmtCheck->execute([$recipeId]);
-$rec = $stmtCheck->fetch(PDO::FETCH_ASSOC);
-
-if (!$rec || (int)$rec['userID'] === $userId) {
-    header("Location: view-recipe.php?id={$recipeId}");
+// Check not already favourited
+$stmt = $pdo->prepare("SELECT 1 FROM favourites WHERE userID = ? AND recipeID = ?");
+$stmt->execute([$userId, $recipeId]);
+if ($stmt->fetchColumn()) {
+    echo json_encode(false);
     exit();
 }
 
-// Requirement: Add to favourites only if not already added
-$stmtExists = $pdo->prepare("SELECT 1 FROM favourites WHERE userID = ? AND recipeID = ?");
-$stmtExists->execute([$userId, $recipeId]);
-if (!$stmtExists->fetchColumn()) {
-    $pdo->prepare("INSERT INTO favourites (userID, recipeID) VALUES (?, ?)")->execute([$userId, $recipeId]);
-}
+// Insert favourite
+$ins = $pdo->prepare("INSERT INTO favourites (userID, recipeID) VALUES (?, ?)");
+$result = $ins->execute([$userId, $recipeId]);
 
-// Requirement: Redirect back to view-recipe page for this recipe
-header("Location: view-recipe.php?id={$recipeId}");
-exit();
-?>
+echo json_encode($result);
